@@ -13,11 +13,12 @@ GRAMMAR = '''start: (_statement NEWLINE)* _statement NEWLINE?
             ?param: (number|address|register)
 
             instruction: WORD (param (","param)*)?
-            label: WORD":"
+            label: CNAME":"
 
             _statement: instruction|label
 
             %import common.WORD
+            %import common.CNAME
             %import common.INT
             %import common.WS_INLINE
             %import common.NEWLINE
