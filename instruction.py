@@ -28,8 +28,22 @@ class InstructionParam:
             if self.parameter_type == ParameterType.IMMEDIATE_EIGHT_BYTE and value > 2**64:
                 raise ValueError('invalid value for parameter type immediate eight byte')
 
+    def __str__(self):
+        if self.parameter_type == ParameterType.REGISTER:
+            return f'%i{self.value.value - 1}'
+        elif self.parameter_type == ParameterType.ADDRESS:
+            return f'${self.value}'
+        else:
+            return str(self.value)
+
 
 class Instruction:
     def __init__(self, instruction_type: InstructionType, params: List[InstructionParam]):
         self.instruction_type = instruction_type
         self.params = params
+
+    def __str__(self):
+        if self.params:
+            return self.instruction_type.name.lower() + ' ' + ', '.join([str(param) for param in self.params])
+        else:
+            return self.instruction_type.name.lower()
