@@ -4,14 +4,18 @@ from instruction_set import Register, InstructionType
 from instruction import InstructionParam, ParameterType, Instruction
 
 
-GRAMMAR = '''start: (instruction NEWLINE)* instruction NEWLINE?
+GRAMMAR = '''start: (_statement NEWLINE)* _statement NEWLINE?
 
             number: INT
             address: "$"INT
             REGISTER_NUMBER: "0".."7"
             register: "%i"REGISTER_NUMBER
             ?param: (number|address|register)
+
             instruction: WORD (param (","param)*)?
+            label: WORD":"
+
+            _statement: instruction|label
 
             %import common.WORD
             %import common.INT
@@ -21,13 +25,15 @@ GRAMMAR = '''start: (instruction NEWLINE)* instruction NEWLINE?
          '''
 
 
-class ASMTransformer(Transformer):
-    def instruction(self, args):
-        instruction, *params = args
-        instruction = instruction.value.upper()
-        instruction_type = InstructionType[instruction]
-        return Instruction(instruction_type, params)
+class Label:
+    def __init__(self, label):
+        self.label = label
 
+    def __str__(self):
+        return f'{self.label}:'
+
+
+class ASMTransformer(Transformer):
     @v_args(inline=True)
     def address(self, address):
         return InstructionParam(ParameterType.ADDRESS, int(address))
@@ -40,10 +46,20 @@ class ASMTransformer(Transformer):
     def register(self, register):
         return InstructionParam(ParameterType.REGISTER, Register(int(register) + 1))
 
+    def instruction(self, args):
+        instruction, *params = args
+        instruction = instruction.value.upper()
+        instruction_type = InstructionType[instruction]
+        return Instruction(instruction_type, params)
+
+    @v_args(inline=True)
+    def label(self, label):
+        return Label(label)
+
     def start(self, args):
         instructions = []
         for arg in args:
-            if isinstance(arg, Instruction):
+            if isinstance(arg, Instruction) or isinstance(arg, Label):
                 instructions.append(arg)
         return instructions
 
