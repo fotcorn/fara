@@ -4,7 +4,7 @@ from instruction_set import Register, InstructionType
 from instruction import InstructionParam, ParameterType, Instruction
 
 
-GRAMMAR = '''start: (_statement NEWLINE)* _statement NEWLINE?
+GRAMMAR = '''start: (_statement? COMMENT? NEWLINE)* _statement? _NEWLINE?
 
             number: INT
             address: "$"INT
@@ -17,12 +17,17 @@ GRAMMAR = '''start: (_statement NEWLINE)* _statement NEWLINE?
 
             _statement: instruction|label
 
+            COMMENT: "//"/[^\\n]*/
+            _NEWLINE: COMMENT? NEWLINE
+
             %import common.WORD
             %import common.CNAME
             %import common.INT
             %import common.WS_INLINE
             %import common.NEWLINE
+
             %ignore WS_INLINE
+            %ignore COMMENT
          '''
 
 
