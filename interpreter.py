@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+
 @dataclass
 class MachineState:
     i0: int = 0
