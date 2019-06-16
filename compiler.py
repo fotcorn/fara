@@ -2,7 +2,7 @@ import sys
 from lark import Lark, Transformer, v_args
 from instruction_set import Register, InstructionType
 from instruction import InstructionParam, ParameterType, Instruction
-
+import ctypes
 
 GRAMMAR = '''start: (_statement? COMMENT? NEWLINE)* _statement? _NEWLINE?
 
@@ -34,11 +34,12 @@ GRAMMAR = '''start: (_statement? COMMENT? NEWLINE)* _statement? _NEWLINE?
 
 
 class Label:
-    def __init__(self, label):
+    def __init__(self, label, position):
         self.label = label
+        self.position = position
 
     def __str__(self):
-        return f'{self.label}:'
+        return f'{self.label}: ({self.position})'
 
 
 class LabelRef:
@@ -50,6 +51,10 @@ class LabelRef:
 
 
 class ASMTransformer(Transformer):
+    def __init__(self):
+        self.instruction_counter = 0
+        self.labels = {}
+
     @v_args(inline=True)
     def address(self, address):
         return InstructionParam(ParameterType.ADDRESS, int(address))
@@ -60,7 +65,6 @@ class ASMTransformer(Transformer):
 
     @v_args(inline=True)
     def char(self, char):
-        print(char)
         return InstructionParam(ParameterType.IMMEDIATE_EIGHT_BYTE, ord(char))
 
     @v_args(inline=True)
@@ -68,6 +72,7 @@ class ASMTransformer(Transformer):
         return InstructionParam(ParameterType.REGISTER, Register(int(register) + 1))
 
     def instruction(self, args):
+        self.instruction_counter += 1
         instruction, *params = args
         instruction = instruction.value.upper()
         instruction_type = InstructionType[instruction]
@@ -79,7 +84,10 @@ class ASMTransformer(Transformer):
 
     @v_args(inline=True)
     def label(self, label):
-        return Label(label)
+        if label in self.labels:
+            raise ValueError('duplicated label')
+        self.labels[label] = self.instruction_counter
+        return None
 
     def start(self, args):
         instructions = []
@@ -99,7 +107,21 @@ def main():
     lark = Lark(GRAMMAR)
     tree = lark.parse(code)
     transformer = ASMTransformer()
-    for instr in transformer.transform(tree):
+    tree = transformer.transform(tree)
+
+    # resolve labels
+    for instruction_counter, instr in enumerate(tree):
+        for i, param in enumerate(instr.params):
+            if isinstance(param, LabelRef):
+                try:
+                    position = transformer.labels[param.label]
+                except KeyError:
+                    raise ValueError(f'label {param.label} not found')
+                relative = position - instruction_counter
+                relative = ctypes.c_uint(relative).value
+                instr.params[i] = InstructionParam(ParameterType.IMMEDIATE_FOUR_BYTE, relative)
+
+    for instr in tree:
         print(instr)
 
 
