@@ -10,7 +10,8 @@ GRAMMAR = '''start: (_statement? COMMENT? NEWLINE)* _statement? _NEWLINE?
             address: "$"INT
             REGISTER_NUMBER: "0".."7"
             register: "%i"REGISTER_NUMBER
-            ?param: (number|address|register)
+            label_ref: CNAME
+            ?param: (number|address|register|label_ref)
 
             instruction: WORD (param (","param)*)?
             label: CNAME":"
@@ -39,6 +40,14 @@ class Label:
         return f'{self.label}:'
 
 
+class LabelRef:
+    def __init__(self, label):
+        self.label = label
+
+    def __str__(self):
+        return f'{self.label}'
+
+
 class ASMTransformer(Transformer):
     @v_args(inline=True)
     def address(self, address):
@@ -57,6 +66,10 @@ class ASMTransformer(Transformer):
         instruction = instruction.value.upper()
         instruction_type = InstructionType[instruction]
         return Instruction(instruction_type, params)
+
+    @v_args(inline=True)
+    def label_ref(self, label):
+        return LabelRef(label)
 
     @v_args(inline=True)
     def label(self, label):

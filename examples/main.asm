@@ -8,3 +8,5 @@ cp 15, $1234
 cp 1234, %i0
 ld %i0, %i1
 // eof comment
+
+jmp main
