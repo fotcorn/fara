@@ -9,4 +9,5 @@ cp 1234, %i0
 ld %i0, %i1
 // eof comment
 
+cp 'a', %i1
 jmp main

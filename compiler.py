@@ -11,7 +11,8 @@ GRAMMAR = '''start: (_statement? COMMENT? NEWLINE)* _statement? _NEWLINE?
             REGISTER_NUMBER: "0".."7"
             register: "%i"REGISTER_NUMBER
             label_ref: CNAME
-            ?param: (number|address|register|label_ref)
+            char: "'"/[^']/"'"
+            ?param: (number|address|register|label_ref|char)
 
             instruction: WORD (param (","param)*)?
             label: CNAME":"
@@ -56,6 +57,11 @@ class ASMTransformer(Transformer):
     @v_args(inline=True)
     def number(self, number):
         return InstructionParam(ParameterType.IMMEDIATE_EIGHT_BYTE, int(number))
+
+    @v_args(inline=True)
+    def char(self, char):
+        print(char)
+        return InstructionParam(ParameterType.IMMEDIATE_EIGHT_BYTE, ord(char))
 
     @v_args(inline=True)
     def register(self, register):
