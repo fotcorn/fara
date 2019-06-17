@@ -1,6 +1,6 @@
 from typing import Union, List
 
-from instruction_set import InstructionType, ParameterType, Register
+from isa.instruction_set import InstructionType, ParameterType, Register
 
 
 class InstructionParam:

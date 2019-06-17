@@ -1,10 +1,8 @@
 import sys
-from lark import Transformer, v_args
-
-from compiler.code_generator import generate_code
-from compiler.parser import parse
-from isa.instruction_set import Register, InstructionType, ParameterType
-from isa.instruction import InstructionParam, Instruction
+from lark import Lark, Transformer, v_args
+from isa.instruction_set import Register, InstructionType
+from isa.instruction import InstructionParam, ParameterType, Instruction
+import ctypes
 
 GRAMMAR = '''start: (_statement? COMMENT? NEWLINE)* _statement? _NEWLINE?
 
@@ -99,24 +97,24 @@ class ASMTransformer(Transformer):
         return instructions
 
 
-def main():
-    if len(sys.argv) != 2:
-        print(f'{sys.argv[0]} <file.asm>')
-        sys.exit(1)
-    with open(sys.argv[1]) as f:
-        code = f.read()
-
-    tree = parse(code)
-
-    for instr in tree:
-        print(instr)
-
-    code = generate_code(tree)
-    
-    out_filename = sys.argv[1].rsplit('.', 2)[0] + '.bin'
-    with open(out_filename, 'wb') as f:
-        f.write(code)
+def parse(code):
+    lark = Lark(GRAMMAR)
+    tree = lark.parse(code)
+    transformer = ASMTransformer()
+    tree = transformer.transform(tree)
+    return _resolve_labels(transformer, tree)
 
 
-if __name__ == '__main__':
-    main()
+def _resolve_labels(transformer, tree):
+    # resolve labels
+    for instruction_counter, instr in enumerate(tree):
+        for i, param in enumerate(instr.params):
+            if isinstance(param, LabelRef):
+                try:
+                    position = transformer.labels[param.label]
+                except KeyError:
+                    raise ValueError(f'label {param.label} not found')
+                relative = position - instruction_counter
+                relative = ctypes.c_uint(relative).value
+                instr.params[i] = InstructionParam(ParameterType.IMMEDIATE_FOUR_BYTE, relative)
+    return tree
