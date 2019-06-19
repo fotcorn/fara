@@ -102,3 +102,6 @@ out
 ## syscalls
 syscall
 sysret
+
+## other
+halt

@@ -60,6 +60,9 @@ class InstructionType(Enum):
     SYSCALL = 0x0901
     SYSRET = 0x0902
 
+    # other
+    HALT = 0x0A01
+
 
 @unique
 class ParameterType(Enum):
