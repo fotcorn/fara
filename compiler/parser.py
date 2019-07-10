@@ -63,16 +63,24 @@ class ASMTransformer(Transformer):
 
     @v_args(inline=True)
     def number(self, number):
-        return InstructionParam(ParameterType.IMMEDIATE_EIGHT_BYTE, int(number))
+        number = int(number)
+        if -2**7 <= number <= 2**7-1:
+            return InstructionParam(ParameterType.IMMEDIATE_ONE_BYTE, int(number))
+        if -2**15 <= number <= 2**15-1:
+            return InstructionParam(ParameterType.IMMEDIATE_TWO_BYTE, int(number))
+        if -2**31 <= number <= 2**31-1:
+            return InstructionParam(ParameterType.IMMEDIATE_FOUR_BYTE, int(number))
+        if -2**63 <= number <= 2**63-1:
+            return InstructionParam(ParameterType.IMMEDIATE_EIGHT_BYTE, int(number))
 
     @v_args(inline=True)
     def char(self, char):
-        return InstructionParam(ParameterType.IMMEDIATE_EIGHT_BYTE, ord(char))
+        return InstructionParam(ParameterType.IMMEDIATE_ONE_BYTE, ord(char))
 
     @v_args(inline=True)
     def escape_char(self, char):
         char = codecs.escape_decode('\\' + char)[0]
-        return InstructionParam(ParameterType.IMMEDIATE_EIGHT_BYTE, ord(char))
+        return InstructionParam(ParameterType.IMMEDIATE_ONE_BYTE, ord(char))
 
     @v_args(inline=True)
     def register(self, register):
