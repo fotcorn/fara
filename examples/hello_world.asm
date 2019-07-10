@@ -9,5 +9,6 @@ out 1, 'o'
 out 1, 'r'
 out 1, 'l'
 out 1, 'd'
+out 1, '\n'
 
 halt

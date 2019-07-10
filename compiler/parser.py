@@ -1,4 +1,5 @@
 import sys
+import codecs
 from lark import Lark, Transformer, v_args
 from isa.instruction_set import Register, InstructionType
 from isa.instruction import InstructionParam, ParameterType, Instruction
@@ -12,7 +13,8 @@ GRAMMAR = '''start: (_statement? COMMENT? NEWLINE)* _statement? _NEWLINE?
             register: "%i"REGISTER_NUMBER
             label_ref: CNAME
             char: "'"/[^']/"'"
-            ?param: (number|address|register|label_ref|char)
+            escape_char: "'\\\\"/[^']/"'"
+            ?param: (number|address|register|label_ref|char|escape_char)
 
             instruction: WORD (param (","param)*)?
             label: CNAME":"
@@ -65,6 +67,11 @@ class ASMTransformer(Transformer):
 
     @v_args(inline=True)
     def char(self, char):
+        return InstructionParam(ParameterType.IMMEDIATE_EIGHT_BYTE, ord(char))
+
+    @v_args(inline=True)
+    def escape_char(self, char):
+        char = codecs.escape_decode('\\' + char)[0]
         return InstructionParam(ParameterType.IMMEDIATE_EIGHT_BYTE, ord(char))
 
     @v_args(inline=True)
