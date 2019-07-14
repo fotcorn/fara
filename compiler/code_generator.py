@@ -8,9 +8,9 @@ from isa.instruction_set import ParameterType
 
 def generate_code(tree: List[Instruction]):
     labels = {}
-    label_placeholders = {}
+    label_placeholders = []
 
-    code = b''
+    code = bytearray()
     for tree_entry in tree:
         if isinstance(tree_entry, Instruction):
             instruction = tree_entry
@@ -30,7 +30,11 @@ def generate_code(tree: List[Instruction]):
                     continue
 
                 if isinstance(param, LabelRef):
-                    label_placeholders[len(code) + 5 + len(param_data)] = param.label
+                    label_placeholders.append((
+                        len(code),
+                        len(code) + 5 + len(param_data),
+                        param.label
+                    ))
                     param_types.append(ParameterType.IMMEDIATE_FOUR_BYTE.value)
                     param_data += struct.pack('<I', 0)
                 else:
@@ -53,6 +57,12 @@ def generate_code(tree: List[Instruction]):
             code += param_data
         elif isinstance(tree_entry, Label):
             labels[tree_entry.label] = len(code)
-    print(labels)
-    print(label_placeholders)
+
+    for instr_position, replace_position, label in label_placeholders:
+        relative = labels[label] - instr_position
+        relative = struct.pack('<i', relative)
+        code[replace_position] = relative[0]
+        code[replace_position + 1] = relative[1]
+        code[replace_position + 2] = relative[2]
+        code[replace_position + 3] = relative[3]
     return code
