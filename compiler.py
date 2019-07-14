@@ -12,10 +12,6 @@ def main():
         code = f.read()
 
     tree = parse(code)
-
-    for instr in tree:
-        print(instr)
-
     code = generate_code(tree)
     
     out_filename = sys.argv[1].rsplit('.', 2)[0] + '.bin'
