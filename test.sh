@@ -9,6 +9,6 @@ venv/bin/python compiler.py examples/main.asm
 
 venv/bin/python emulator.py examples/hello_world.bin
 venv/bin/python emulator.py examples/add.bin
-venv/bin/python compiler.py examples/size.bin
+venv/bin/python emulator.py examples/size.bin
 # venv/bin/python emulator.py examples/loop.bin
 # venv/bin/python emulator.py examples/main.bin
