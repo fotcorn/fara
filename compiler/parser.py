@@ -19,13 +19,14 @@ GRAMMAR = '''start: (_statement? COMMENT? NEWLINE)* _statement? _NEWLINE?
             INSTRUCTION_SIZE: ("1"|"2"|"4"|"8")
             INSTRUCTION_SIGNEDNESS: ("u"|"s")
             instruction: WORD INSTRUCTION_SIZE? INSTRUCTION_SIGNEDNESS?
-            expression: instruction (param (","param)*)?
+            expression: instruction (_whitespace param (","param)*)?
             label: CNAME":"
 
             _statement: expression|label
 
             COMMENT: "//"/[^\\n]*/
             _NEWLINE: COMMENT? NEWLINE
+            _whitespace: (" "|/\t/)+
 
             %import common.WORD
             %import common.CNAME
