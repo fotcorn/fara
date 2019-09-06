@@ -75,6 +75,55 @@ class ParameterType(Enum):
 
 
 @unique
+class InstructionSize(Enum):
+    ONE_BYTE = 0x1
+    TWO_BYTE = 0x2
+    FOUR_BYTE = 0x3
+    EIGHT_BYTE = 0x4
+
+    def __str__(self):
+        if self == self.ONE_BYTE:
+            return '1'
+        elif self == self.TWO_BYTE:
+            return '2'
+        elif self == self.FOUR_BYTE:
+            return '4'
+        elif self == self.EIGHT_BYTE:
+            return '8'
+
+    @classmethod
+    def from_string(cls, string):
+        if string == '1':
+            return cls.ONE_BYTE
+        elif string == '2':
+            return cls.TWO_BYTE
+        elif string == '4':
+            return cls.FOUR_BYTE
+        elif string == '8':
+            return cls.EIGHT_BYTE
+        else:
+            raise ValueError(f'Invalid value for InstructionSize: {string}')
+
+
+@unique
+class InstructionSignedness(Enum):
+    SIGNED = 0x0
+    UNSIGNED = 0x1
+
+    def __str__(self):
+        return 's' if self == self.SIGNED else 'u'
+
+    @classmethod
+    def from_string(cls, string):
+        if string == 's':
+            return cls.SIGNED
+        elif string == 'u':
+            return cls.UNSIGNED
+        else:
+            raise ValueError(f'Invalid value for InstructionSignedness: {string}')
+
+
+@unique
 class Register(Enum):
     I0 = 0x01
     I1 = 0x02

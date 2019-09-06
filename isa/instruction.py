@@ -1,6 +1,6 @@
 from typing import Union, List
 
-from isa.instruction_set import InstructionType, ParameterType, Register
+from isa.instruction_set import InstructionType, ParameterType, Register, InstructionSignedness, InstructionSize
 
 
 class InstructionParam:
@@ -13,9 +13,6 @@ class InstructionParam:
         if self.parameter_type != ParameterType.REGISTER:
             if not isinstance(value, int):
                 raise ValueError('Invalid value for instruction param')
-            if value < 0:
-                raise ValueError(
-                    'Instruction param value cannot be smaller than 0')
 
             if self.parameter_type == ParameterType.ADDRESS and value > 2**64:
                 raise ValueError('invalid value for parameter type address')
@@ -38,12 +35,16 @@ class InstructionParam:
 
 
 class Instruction:
-    def __init__(self, instruction_type: InstructionType, params: List[InstructionParam]):
+    def __init__(self, instruction_type: InstructionType, size: InstructionSize, signedness: InstructionSignedness,
+                 params: List[InstructionParam]):
         self.instruction_type = instruction_type
         self.params = params
+        self.size = size
+        self.signedness = signedness
 
     def __str__(self):
+        instruction = '{}{}{}'.format(self.instruction_type.name.lower(), self.size, self.signedness)
         if self.params:
-            return self.instruction_type.name.lower() + ' ' + ', '.join([str(param) for param in self.params])
+            return instruction + ' ' + ', '.join([str(param) for param in self.params])
         else:
-            return self.instruction_type.name.lower()
+            return instruction

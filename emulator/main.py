@@ -1,11 +1,11 @@
 import sys
-import struct
+import bitstruct
 
 from emulator.exceptions import HaltException
 from emulator.instructions.dispatch import dispatch
 from emulator.machine_state import MachineState
 from isa.instruction import Instruction, InstructionParam
-from isa.instruction_set import InstructionType, ParameterType, Register
+from isa.instruction_set import InstructionType, ParameterType, Register, InstructionSize, InstructionSignedness
 
 
 class Interpreter:
@@ -25,10 +25,10 @@ def main():
     pc = 1000
 
     while True:
-        instruction = state.memory[pc:pc+5]
-        instruction, *param_types = struct.unpack('<HBBB', instruction)
+        instruction = state.memory[pc:pc+4]
+        instruction, size, signedness, *param_types = bitstruct.unpack('u12u3u1' + 'u4u4u4u4', instruction)
 
-        pc_offset = 5
+        pc_offset = 4
         params = []
         instruction = InstructionType(instruction)
         for param_type in param_types:
@@ -36,22 +36,22 @@ def main():
                 break
             param_type = ParameterType(param_type)
             if param_type == ParameterType.ADDRESS:
-                data = struct.unpack('<Q', state.memory[pc+pc_offset:pc+pc_offset+8])[0]
+                data = bitstruct.unpack('u64', state.memory[pc+pc_offset:pc+pc_offset+8])[0]
                 pc_offset += 8
             elif param_type == ParameterType.IMMEDIATE_EIGHT_BYTE:
-                data = struct.unpack('<Q', state.memory[pc+pc_offset:pc+pc_offset+8])[0]
+                data = bitstruct.unpack('s64', state.memory[pc+pc_offset:pc+pc_offset+8])[0]
                 pc_offset += 8
             elif param_type == ParameterType.IMMEDIATE_FOUR_BYTE:
-                data = struct.unpack('<I', state.memory[pc+pc_offset:pc+pc_offset+4])[0]
+                data = bitstruct.unpack('s32', state.memory[pc+pc_offset:pc+pc_offset+4])[0]
                 pc_offset += 4
             elif param_type == ParameterType.IMMEDIATE_TWO_BYTE:
-                data = struct.unpack('<H', state.memory[pc+pc_offset:pc+pc_offset+2])[0]
+                data = bitstruct.unpack('s16', state.memory[pc+pc_offset:pc+pc_offset+2])[0]
                 pc_offset += 2
             elif param_type == ParameterType.IMMEDIATE_ONE_BYTE:
-                data = struct.unpack('<B', state.memory[pc+pc_offset:pc+pc_offset+1])[0]
+                data = bitstruct.unpack('s8', state.memory[pc+pc_offset:pc+pc_offset+1])[0]
                 pc_offset += 1
             elif param_type == ParameterType.REGISTER:
-                data = struct.unpack('<B', state.memory[pc+pc_offset:pc+pc_offset+1])[0]
+                data = bitstruct.unpack('u8', state.memory[pc+pc_offset:pc+pc_offset+1])[0]
                 pc_offset += 1
                 data = Register(data)
             else:
@@ -62,7 +62,7 @@ def main():
                 data
             ))
 
-        instruction = Instruction(instruction, params)
+        instruction = Instruction(instruction, InstructionSize(size), InstructionSignedness(signedness), params)
         try:
             dispatch(instruction, state)
         except HaltException:
