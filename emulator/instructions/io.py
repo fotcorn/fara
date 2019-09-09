@@ -1,3 +1,4 @@
+import os
 import sys
 from typing import List
 
@@ -13,3 +14,16 @@ def out(params: List[InstructionParam], state: MachineState):
 
     if port == 1:
         sys.stdout.write(chr(data))
+    else:
+        raise ValueError(f'Unsupported out port: {port}')
+
+
+def in_instr(params: List[InstructionParam], state: MachineState):
+    assert len(params) == 2
+    port = state.get_value(params[0])
+
+    if port == 1:
+        char = os.read(0, 1)[0]
+    else:
+        raise ValueError(f'Unsupported in port: {port}')
+    state.set_value(params[1], char)
