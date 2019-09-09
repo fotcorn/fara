@@ -18,6 +18,7 @@ def generate_code(tree: List[Instruction]):
 
             param_types = []
             param_data = b''
+            current_label_placeholders = []
 
             # an instruction can have up to 3 parameters
             # parameter types are appended after instruction type which is 2 bytes long
@@ -30,11 +31,11 @@ def generate_code(tree: List[Instruction]):
                     continue
 
                 if isinstance(param, LabelRef):
-                    label_placeholders.append((
-                        len(code),
-                        len(code) + 4 + len(param_data),
-                        param.label
-                    ))
+                    current_label_placeholders.append({
+                        'next_instruction_address': 0,
+                        'replacement_address': len(code) + 4 + len(param_data),
+                        'label': param.label,
+                    })
                     param_types.append(ParameterType.IMMEDIATE_FOUR_BYTE.value)
                     param_data += bitstruct.pack('u32', 0)
                 else:
@@ -60,14 +61,20 @@ def generate_code(tree: List[Instruction]):
                                    instruction.signedness.value,
                                    *param_types)
             code += param_data
+
+            for placeholder in current_label_placeholders:
+                placeholder['next_instruction_address'] = len(code)
+            label_placeholders.extend(current_label_placeholders)
+
         elif isinstance(tree_entry, Label):
             labels[tree_entry.label] = len(code)
 
-    for instr_position, replace_position, label in label_placeholders:
-        relative = labels[label] - instr_position
+    for placeholder in label_placeholders:
+        relative = labels[placeholder['label']] - placeholder['next_instruction_address']
         relative = bitstruct.pack('s32', relative)
-        code[replace_position] = relative[0]
-        code[replace_position + 1] = relative[1]
-        code[replace_position + 2] = relative[2]
-        code[replace_position + 3] = relative[3]
+        replacement_address = placeholder['replacement_address']
+        code[replacement_address] = relative[0]
+        code[replacement_address + 1] = relative[1]
+        code[replacement_address + 2] = relative[2]
+        code[replacement_address + 3] = relative[3]
     return code
