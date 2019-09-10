@@ -8,11 +8,6 @@ from isa.instruction import Instruction, InstructionParam
 from isa.instruction_set import InstructionType, ParameterType, Register, InstructionSize, InstructionSignedness
 
 
-class Interpreter:
-    def __init__(self):
-        self.state = MachineState()
-
-
 def main():
     if len(sys.argv) != 2:
         print(f'{sys.argv[0]} <file.bin>')
@@ -24,6 +19,10 @@ def main():
     state.memory[1000:1000+len(code)] = code
     state.pc = 1000
 
+    run(state)
+
+
+def run(state: MachineState):
     while True:
         instruction = state.memory[state.pc:state.pc+4]
         instruction, size, signedness, *param_types = bitstruct.unpack('u12u3u1' + 'u4u4u4u4', instruction)
