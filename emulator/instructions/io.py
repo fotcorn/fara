@@ -23,7 +23,10 @@ def in_instr(params: List[InstructionParam], state: MachineState):
     port = state.get_value(params[0])
 
     if port == 1:
-        char = os.read(0, 1)[0]
+        while True:
+            if len(state.stdin) > 0:
+                char = state.stdin.pop()
+                break
     else:
         raise ValueError(f'Unsupported in port: {port}')
     state.set_value(params[1], char)

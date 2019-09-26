@@ -14,7 +14,7 @@ def dispatch(instruction: Instruction, state: MachineState):
     elif instruction.instruction_type == InstructionType.IN:
         io.in_instr(instruction.params, state)
     elif instruction.instruction_type == InstructionType.HALT:
-        other.halt(instruction.params)
+        other.halt(instruction.params, state)
     elif instruction.instruction_type == InstructionType.JMP:
         branch.jmp(instruction.params, state)
     elif instruction.instruction_type == InstructionType.JE:

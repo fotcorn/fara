@@ -17,6 +17,10 @@ class MachineState:
 
     memory: bytearray = bytearray(10000)
 
+    stdin = []
+
+    running = True
+
     def get_value(self, param: InstructionParam):
         if param.parameter_type == ParameterType.REGISTER:
             if param.value == Register.I0:

@@ -1,3 +1,0 @@
-
-class HaltException(Exception):
-    pass
