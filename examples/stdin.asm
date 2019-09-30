@@ -1,6 +1,5 @@
 start:
     in 1, %i0
-    out 1, %i0
-    out 1, '\n'
+    cp %i0, $65536
     jne %i0, 'q', start
 halt

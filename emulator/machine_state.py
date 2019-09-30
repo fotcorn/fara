@@ -1,5 +1,9 @@
+from typing import List
+
+import bitstruct
+
 from isa.instruction import InstructionParam
-from isa.instruction_set import ParameterType, Register
+from isa.instruction_set import ParameterType, Register, InstructionSize
 
 
 class MachineState:
@@ -15,34 +19,53 @@ class MachineState:
     pc: int = 0
     sp: int = 0
 
-    memory: bytearray = bytearray(10000)
+    memory: bytearray = bytearray(100000)
 
-    stdin = []
+    stdin: List[int] = []
 
     running = True
 
-    def get_value(self, param: InstructionParam):
+    def get_value(self, param: InstructionParam, size: InstructionSize):
         if param.parameter_type == ParameterType.REGISTER:
             if param.value == Register.I0:
-                return self.i0
+                value = self.i0
             elif param.value == Register.I1:
-                return self.i1
+                value = self.i1
             elif param.value == Register.I2:
-                return self.i2
+                value = self.i2
             elif param.value == Register.I3:
-                return self.i3
+                value = self.i3
             elif param.value == Register.I4:
-                return self.i4
+                value = self.i4
             elif param.value == Register.I5:
-                return self.i5
+                value = self.i5
             elif param.value == Register.I6:
-                return self.i6
+                value = self.i6
             elif param.value == Register.I7:
-                return self.i7
+                value = self.i7
             else:
                 raise ValueError('Unknown register')
+            if size == InstructionSize.ONE_BYTE:
+                return value & 0xFF
+            elif size == InstructionSize.TWO_BYTE:
+                return value & 0xFFFF
+            elif size == InstructionSize.FOUR_BYTE:
+                return value & 0xFFFFFFFF
+            elif size == InstructionSize.EIGHT_BYTE:
+                return value
+            else:
+                raise ValueError('Unknown instruction size')
         elif param.parameter_type == ParameterType.ADDRESS:
-            raise NotImplementedError('MachineState.get_value with ADDRESS parameter type not implemented')
+            if size == InstructionSize.ONE_BYTE:
+                return bitstruct.unpack('u8', self.memory[param.value:param.value+1])
+            elif size == InstructionSize.TWO_BYTE:
+                return bitstruct.unpack('u16', self.memory[param.value:param.value+2])
+            elif size == InstructionSize.FOUR_BYTE:
+                return bitstruct.unpack('u32', self.memory[param.value:param.value+4])
+            elif size == InstructionSize.EIGHT_BYTE:
+                return bitstruct.unpack('u64', self.memory[param.value:param.value+8])
+            else:
+                raise ValueError('Unknown instruction size')
         elif param.parameter_type == ParameterType.IMMEDIATE_ONE_BYTE:
             return param.value
         elif param.parameter_type == ParameterType.IMMEDIATE_TWO_BYTE:
@@ -52,7 +75,7 @@ class MachineState:
         elif param.parameter_type == ParameterType.IMMEDIATE_EIGHT_BYTE:
             return param.value
 
-    def set_value(self, param: InstructionParam, value):
+    def set_value(self, param: InstructionParam, value: int, size: InstructionSize):
         if param.parameter_type == ParameterType.REGISTER:
             if param.value == Register.I0:
                 self.i0 = value
@@ -73,7 +96,16 @@ class MachineState:
             else:
                 raise ValueError('Unknown register')
         elif param.parameter_type == ParameterType.ADDRESS:
-            raise NotImplementedError('MachineState.get_value with ADDRESS parameter type not implemented')
+            if size == InstructionSize.ONE_BYTE:
+                self.memory[param.value:param.value + 1] = bitstruct.pack('u8', value)
+            elif size == InstructionSize.TWO_BYTE:
+                self.memory[param.value:param.value + 2] = bitstruct.pack('u16', value)
+            elif size == InstructionSize.FOUR_BYTE:
+                self.memory[param.value:param.value + 4] = bitstruct.pack('u32', value)
+            elif size == InstructionSize.EIGHT_BYTE:
+                self.memory[param.value:param.value + 8] = bitstruct.pack('u64', value)
+            else:
+                raise ValueError('Unknown instruction size')
         elif param.parameter_type == ParameterType.IMMEDIATE_ONE_BYTE or ParameterType.IMMEDIATE_TWO_BYTE or \
                 ParameterType.IMMEDIATE_FOUR_BYTE or ParameterType.IMMEDIATE_EIGHT_BYTE:
             raise ValueError('set_value: cannot set value on immediate parameter')

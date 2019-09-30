@@ -6,20 +6,20 @@ from emulator.instructions import io, other, core, branch
 
 def dispatch(instruction: Instruction, state: MachineState):
     if instruction.instruction_type == InstructionType.CP:
-        core.cp(instruction.params, state)
+        core.cp(instruction, state)
     elif instruction.instruction_type == InstructionType.ADD:
-        core.add(instruction.params, state)
+        core.add(instruction, state)
     elif instruction.instruction_type == InstructionType.OUT:
-        io.out(instruction.params, state)
+        io.out(instruction, state)
     elif instruction.instruction_type == InstructionType.IN:
-        io.in_instr(instruction.params, state)
+        io.in_instr(instruction, state)
     elif instruction.instruction_type == InstructionType.HALT:
-        other.halt(instruction.params, state)
+        other.halt(instruction, state)
     elif instruction.instruction_type == InstructionType.JMP:
-        branch.jmp(instruction.params, state)
+        branch.jmp(instruction, state)
     elif instruction.instruction_type == InstructionType.JE:
-        branch.je(instruction.params, state)
+        branch.je(instruction, state)
     elif instruction.instruction_type == InstructionType.JNE:
-        branch.jne(instruction.params, state)
+        branch.jne(instruction, state)
     else:
         raise ValueError(f'unknown or unimplemented instruction: {instruction.instruction_type}')
