@@ -24,7 +24,6 @@ def main():
     state.pc = 0x1000
 
     state.memory[SCREEN_OFFSET:SCREEN_OFFSET+SCREEN_WIDTH*SCREEN_HEIGHT] = [0] * (SCREEN_WIDTH * SCREEN_HEIGHT)
-    state.memory[SCREEN_OFFSET] = 80
 
     pygame.init()
     pygame.ftfont.init()
