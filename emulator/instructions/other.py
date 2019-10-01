@@ -1,9 +1,7 @@
-from typing import List
-
-from emulator.exceptions import HaltException
-from isa.instruction import InstructionParam
+from emulator.machine_state import MachineState
+from isa.instruction import Instruction
 
 
-def halt(params: List[InstructionParam]):
-    assert len(params) == 0
-    raise HaltException()
+def halt(instr: Instruction, state: MachineState):
+    assert len(instr.params) == 0
+    state.running = False

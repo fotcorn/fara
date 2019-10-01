@@ -1,11 +1,15 @@
 import sys
-import bitstruct
+import threading
 
-from emulator.exceptions import HaltException
-from emulator.instructions.dispatch import dispatch
-from emulator.machine_state import MachineState
-from isa.instruction import Instruction, InstructionParam
-from isa.instruction_set import InstructionType, ParameterType, Register, InstructionSize, InstructionSignedness
+from .machine_state import MachineState
+from .loop import run
+
+import pygame
+import pygame.ftfont
+
+SCREEN_WIDTH = 100
+SCREEN_HEIGHT = 30
+SCREEN_OFFSET = 0x10000
 
 
 def main():
@@ -16,60 +20,47 @@ def main():
         code = f.read()
 
     state = MachineState()
-    state.memory[1000:1000+len(code)] = code
-    state.pc = 1000
+    state.memory[0x1000:0x1000+len(code)] = code
+    state.pc = 0x1000
 
-    run(state)
+    state.memory[SCREEN_OFFSET:SCREEN_OFFSET+SCREEN_WIDTH*SCREEN_HEIGHT] = [0] * (SCREEN_WIDTH * SCREEN_HEIGHT)
 
+    pygame.init()
+    pygame.ftfont.init()
 
-def run(state: MachineState):
-    while True:
-        instruction = state.memory[state.pc:state.pc+4]
-        instruction, size, signedness, *param_types = bitstruct.unpack('u12u3u1' + 'u4u4u4u4', instruction)
+    screen = pygame.display.set_mode((1280, 720))
+    font_name = pygame.font.match_font('dejavu sans mono')
+    font = pygame.ftfont.Font(font_name, 170)
 
-        pc_offset = 4
-        params = []
-        instruction = InstructionType(instruction)
-        for param_type in param_types:
-            if param_type == 0:
-                break
-            param_type = ParameterType(param_type)
-            if param_type == ParameterType.ADDRESS:
-                data = bitstruct.unpack('u64', state.memory[state.pc+pc_offset:state.pc+pc_offset+8])[0]
-                pc_offset += 8
-            elif param_type == ParameterType.IMMEDIATE_EIGHT_BYTE:
-                data = bitstruct.unpack('s64', state.memory[state.pc+pc_offset:state.pc+pc_offset+8])[0]
-                pc_offset += 8
-            elif param_type == ParameterType.IMMEDIATE_FOUR_BYTE:
-                data = bitstruct.unpack('s32', state.memory[state.pc+pc_offset:state.pc+pc_offset+4])[0]
-                pc_offset += 4
-            elif param_type == ParameterType.IMMEDIATE_TWO_BYTE:
-                data = bitstruct.unpack('s16', state.memory[state.pc+pc_offset:state.pc+pc_offset+2])[0]
-                pc_offset += 2
-            elif param_type == ParameterType.IMMEDIATE_ONE_BYTE:
-                data = bitstruct.unpack('s8', state.memory[state.pc+pc_offset:state.pc+pc_offset+1])[0]
-                pc_offset += 1
-            elif param_type == ParameterType.REGISTER:
-                data = bitstruct.unpack('u8', state.memory[state.pc+pc_offset:state.pc+pc_offset+1])[0]
-                pc_offset += 1
-                data = Register(data)
-            else:
-                raise ValueError(f'invalid parameter type: {param_type}')
+    background = pygame.Surface(screen.get_size())
+    background.fill((0, 0, 0))
+    background = background.convert()
 
-            params.append(InstructionParam(
-                param_type,
-                data
-            ))
+    emu_thread = threading.Thread(target=run, args=(state,), daemon=True)
+    emu_thread.start()
 
-        instruction = Instruction(instruction, InstructionSize(size), InstructionSignedness(signedness), params)
+    while state.running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                state.running = False
+            elif event.type == pygame.KEYDOWN and event.unicode != '':
+                state.stdin.append(ord(event.unicode))
 
-        # program counter is already on the next instruction when executing the instruction
-        state.pc += pc_offset
+        screen.blit(background, (0, 0))
 
-        try:
-            dispatch(instruction, state)
-        except HaltException:
-            return
+        display = state.memory[SCREEN_OFFSET:SCREEN_OFFSET+SCREEN_WIDTH*SCREEN_HEIGHT]
+        display = ''.join([chr(c) if 32 < c < 127 else '' for c in display])
+
+        for i in range(SCREEN_HEIGHT):
+            line = display[i*SCREEN_WIDTH:(i+1)*SCREEN_WIDTH]
+            message = font.render(line, True, (255, 255, 255))
+            rect = message.get_rect()
+            surface = pygame.transform.smoothscale(message, (rect.width // 8, rect.height // 8))
+            screen.blit(surface, (0, 3 + i * 23))
+
+        pygame.display.flip()
+
+    pygame.quit()
 
 
 if __name__ == '__main__':

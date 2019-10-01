@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 import bitstruct
 
 from compiler.parser import Label, LabelRef
@@ -7,7 +7,7 @@ from isa.instruction_set import ParameterType
 
 
 def generate_code(tree: List[Instruction]):
-    labels = {}
+    labels: Dict[str, int] = {}
     label_placeholders = []
 
     code = bytearray()
@@ -18,7 +18,7 @@ def generate_code(tree: List[Instruction]):
 
             param_types = []
             param_data = b''
-            current_label_placeholders = []
+            current_label_placeholders: List = []
 
             # an instruction can have up to 3 parameters
             # parameter types are appended after instruction type which is 2 bytes long

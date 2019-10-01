@@ -1,16 +1,15 @@
-import os
 import sys
-from typing import List
 
 from emulator.machine_state import MachineState
-from isa.instruction import InstructionParam
+from isa.instruction import Instruction
+from isa.instruction_set import InstructionSize
 
 
-def out(params: List[InstructionParam], state: MachineState):
-    assert len(params) == 2
+def out(instr: Instruction, state: MachineState):
+    assert len(instr.params) == 2
 
-    port = state.get_value(params[0])
-    data = state.get_value(params[1])
+    port = state.get_value(instr.params[0], InstructionSize.ONE_BYTE)
+    data = state.get_value(instr.params[1], InstructionSize.ONE_BYTE)
 
     if port == 1:
         sys.stdout.write(chr(data))
@@ -18,12 +17,15 @@ def out(params: List[InstructionParam], state: MachineState):
         raise ValueError(f'Unsupported out port: {port}')
 
 
-def in_instr(params: List[InstructionParam], state: MachineState):
-    assert len(params) == 2
-    port = state.get_value(params[0])
+def in_instr(instr: Instruction, state: MachineState):
+    assert len(instr.params) == 2
+    port = state.get_value(instr.params[0], InstructionSize.ONE_BYTE)
 
     if port == 1:
-        char = os.read(0, 1)[0]
+        while True:
+            if len(state.stdin) > 0:
+                char = state.stdin.pop()
+                break
     else:
         raise ValueError(f'Unsupported in port: {port}')
-    state.set_value(params[1], char)
+    state.set_value(instr.params[1], char, InstructionSize.ONE_BYTE)
