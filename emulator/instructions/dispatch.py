@@ -9,6 +9,8 @@ def dispatch(instruction: Instruction, state: MachineState):
         core.cp(instruction, state)
     elif instruction.instruction_type == InstructionType.ADD:
         core.add(instruction, state)
+    elif instruction.instruction_type == InstructionType.INC:
+        core.inc(instruction, state)
     elif instruction.instruction_type == InstructionType.OUT:
         io.out(instruction, state)
     elif instruction.instruction_type == InstructionType.IN:
