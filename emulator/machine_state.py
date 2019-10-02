@@ -55,17 +55,6 @@ class MachineState:
                 return value
             else:
                 raise ValueError('Unknown instruction size')
-        elif param.parameter_type == ParameterType.ADDRESS:
-            if size == InstructionSize.ONE_BYTE:
-                return bitstruct.unpack('u8', self.memory[param.value:param.value+1])
-            elif size == InstructionSize.TWO_BYTE:
-                return bitstruct.unpack('u16', self.memory[param.value:param.value+2])
-            elif size == InstructionSize.FOUR_BYTE:
-                return bitstruct.unpack('u32', self.memory[param.value:param.value+4])
-            elif size == InstructionSize.EIGHT_BYTE:
-                return bitstruct.unpack('u64', self.memory[param.value:param.value+8])
-            else:
-                raise ValueError('Unknown instruction size')
         elif param.parameter_type == ParameterType.IMMEDIATE_ONE_BYTE:
             return param.value
         elif param.parameter_type == ParameterType.IMMEDIATE_TWO_BYTE:
@@ -95,17 +84,6 @@ class MachineState:
                 self.i7 = value
             else:
                 raise ValueError('Unknown register')
-        elif param.parameter_type == ParameterType.ADDRESS:
-            if size == InstructionSize.ONE_BYTE:
-                self.memory[param.value:param.value + 1] = bitstruct.pack('u8', value)
-            elif size == InstructionSize.TWO_BYTE:
-                self.memory[param.value:param.value + 2] = bitstruct.pack('u16', value)
-            elif size == InstructionSize.FOUR_BYTE:
-                self.memory[param.value:param.value + 4] = bitstruct.pack('u32', value)
-            elif size == InstructionSize.EIGHT_BYTE:
-                self.memory[param.value:param.value + 8] = bitstruct.pack('u64', value)
-            else:
-                raise ValueError('Unknown instruction size')
         elif param.parameter_type == ParameterType.IMMEDIATE_ONE_BYTE or ParameterType.IMMEDIATE_TWO_BYTE or \
                 ParameterType.IMMEDIATE_FOUR_BYTE or ParameterType.IMMEDIATE_EIGHT_BYTE:
             raise ValueError('set_value: cannot set value on immediate parameter')

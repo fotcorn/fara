@@ -1,4 +1,4 @@
-cp 1, %i0
+mov 1, %i0
 add 5, %i0
 
 // convert to ascii

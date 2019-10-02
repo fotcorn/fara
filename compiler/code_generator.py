@@ -41,9 +41,7 @@ def generate_code(tree: List[Instruction]):
                 else:
                     param_types.append(param.parameter_type.value)
 
-                    if param.parameter_type == ParameterType.ADDRESS:
-                        param_data += bitstruct.pack('u64', param.value)
-                    elif param.parameter_type == ParameterType.IMMEDIATE_EIGHT_BYTE:
+                    if param.parameter_type == ParameterType.IMMEDIATE_EIGHT_BYTE:
                         param_data += bitstruct.pack('s64', param.value)
                     elif param.parameter_type == ParameterType.IMMEDIATE_FOUR_BYTE:
                         param_data += bitstruct.pack('s32', param.value)

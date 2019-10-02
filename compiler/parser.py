@@ -7,14 +7,13 @@ import ctypes
 
 GRAMMAR = '''start: (_statement? COMMENT? NEWLINE)* _statement? _NEWLINE?
 
-            number: INT
-            address: "$"INT
+            number: "$"?INT
             REGISTER_NUMBER: "0".."7"
             register: "%i"REGISTER_NUMBER
             label_ref: CNAME
             char: "'"/[^']/"'"
             escape_char: "'\\\\"/[^']/"'"
-            ?param: (number|address|register|label_ref|char|escape_char)
+            ?param: (number|register|label_ref|char|escape_char)
 
             INSTRUCTION_SIZE: ("1"|"2"|"4"|"8")
             INSTRUCTION_SIGNEDNESS: ("u"|"s")
@@ -59,10 +58,6 @@ class ASMTransformer(Transformer):
     def __init__(self):
         self.instruction_counter = 0
         self.labels = {}
-
-    @v_args(inline=True)
-    def address(self, address):
-        return InstructionParam(ParameterType.ADDRESS, int(address))
 
     @v_args(inline=True)
     def number(self, number):

@@ -5,8 +5,12 @@ from emulator.instructions import io, other, core, branch
 
 
 def dispatch(instruction: Instruction, state: MachineState):
-    if instruction.instruction_type == InstructionType.CP:
-        core.cp(instruction, state)
+    if instruction.instruction_type == InstructionType.MOV:
+        core.mov(instruction, state)
+    elif instruction.instruction_type == InstructionType.LD:
+        core.ld(instruction, state)
+    elif instruction.instruction_type == InstructionType.STR:
+        core.str_instr(instruction, state)
     elif instruction.instruction_type == InstructionType.ADD:
         core.add(instruction, state)
     elif instruction.instruction_type == InstructionType.INC:

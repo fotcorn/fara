@@ -19,10 +19,7 @@ def run(state: MachineState):
             if param_type == 0:
                 break
             param_type = ParameterType(param_type)
-            if param_type == ParameterType.ADDRESS:
-                data = bitstruct.unpack('u64', state.memory[state.pc+pc_offset:state.pc+pc_offset+8])[0]
-                pc_offset += 8
-            elif param_type == ParameterType.IMMEDIATE_EIGHT_BYTE:
+            if param_type == ParameterType.IMMEDIATE_EIGHT_BYTE:
                 data = bitstruct.unpack('u64', state.memory[state.pc+pc_offset:state.pc+pc_offset+8])[0]
                 pc_offset += 8
             elif param_type == ParameterType.IMMEDIATE_FOUR_BYTE:
