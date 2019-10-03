@@ -65,6 +65,15 @@ class MachineState:
             return param.value
 
     def set_value(self, param: InstructionParam, value: int, size: InstructionSize):
+        if size == InstructionSize.ONE_BYTE:
+            value = value & 0xFF
+        elif size == InstructionSize.TWO_BYTE:
+            value = value & 0xFFFF
+        elif size == InstructionSize.FOUR_BYTE:
+            value = value & 0xFFFFFFFF
+        elif size == InstructionSize.EIGHT_BYTE:
+            value = value & 0xFFFFFFFFFFFFFFFF
+
         if param.parameter_type == ParameterType.REGISTER:
             if param.value == Register.I0:
                 self.i0 = value
