@@ -4,16 +4,20 @@ from compiler.code_generator import generate_code
 from compiler.parser import parse
 
 
+def compile_code(source_code):
+    tree = parse(source_code)
+    return generate_code(tree)
+
+
 def main():
     if len(sys.argv) != 2:
         print(f'{sys.argv[0]} <file.asm>')
         sys.exit(1)
     with open(sys.argv[1]) as f:
-        code = f.read()
+        source_code = f.read()
 
-    tree = parse(code)
-    code = generate_code(tree)
+    binary = compile_code(source_code)
 
     out_filename = sys.argv[1].rsplit('.', 2)[0] + '.bin'
     with open(out_filename, 'wb') as f:
-        f.write(code)
+        f.write(binary)
