@@ -27,4 +27,6 @@ def jne(instr: Instruction, state: MachineState):
 def jmp(instr: Instruction, state: MachineState):
     assert len(instr.params) == 1
     jump_target = state.get_value(instr.params[0], instr.size)
-    state.pc += jump_target
+    unsigned_int = bitstruct.pack('u32', jump_target)
+    signed_int = bitstruct.unpack('s32', unsigned_int)[0]
+    state.pc += signed_int
