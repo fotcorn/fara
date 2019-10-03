@@ -15,6 +15,8 @@ def dispatch(instruction: Instruction, state: MachineState):
         core.add(instruction, state)
     elif instruction.instruction_type == InstructionType.INC:
         core.inc(instruction, state)
+    elif instruction.instruction_type == InstructionType.DEC:
+        core.dec(instruction, state)
     elif instruction.instruction_type == InstructionType.OUT:
         io.out(instruction, state)
     elif instruction.instruction_type == InstructionType.IN:
