@@ -17,7 +17,7 @@ def ld(instr: Instruction, state: MachineState):
     params = instr.params
     assert len(params) == 2
     size = instr.size
-    address = state.get_value(params[0], size)
+    address = state.get_value(params[0], InstructionSize.EIGHT_BYTE)
     if size == InstructionSize.ONE_BYTE:
         value = bitstruct.unpack('u8', state.memory[address:address+1])
     elif size == InstructionSize.TWO_BYTE:
@@ -34,7 +34,8 @@ def ld(instr: Instruction, state: MachineState):
 def str_instr(instr: Instruction, state: MachineState):
     size = instr.size
     value = state.get_value(instr.params[0], size)
-    address = state.get_value(instr.params[1], size)
+    address = state.get_value(instr.params[1], InstructionSize.EIGHT_BYTE)
+
     if size == InstructionSize.ONE_BYTE:
         state.memory[address:address + 1] = bitstruct.pack('u8', value)
     elif size == InstructionSize.TWO_BYTE:
