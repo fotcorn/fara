@@ -1,7 +1,7 @@
 from emulator.machine_state import MachineState
 from isa.instruction import Instruction
 from isa.instruction_set import InstructionType
-from emulator.instructions import io, other, core, branch
+from emulator.instructions import io, other, core, branch, arithmetic
 
 
 def dispatch(instruction: Instruction, state: MachineState):
@@ -12,11 +12,13 @@ def dispatch(instruction: Instruction, state: MachineState):
     elif instruction.instruction_type == InstructionType.STR:
         core.str_instr(instruction, state)
     elif instruction.instruction_type == InstructionType.ADD:
-        core.add(instruction, state)
+        arithmetic.add(instruction, state)
+    elif instruction.instruction_type == InstructionType.SUB:
+        arithmetic.sub(instruction, state)
     elif instruction.instruction_type == InstructionType.INC:
-        core.inc(instruction, state)
+        arithmetic.inc(instruction, state)
     elif instruction.instruction_type == InstructionType.DEC:
-        core.dec(instruction, state)
+        arithmetic.dec(instruction, state)
     elif instruction.instruction_type == InstructionType.OUT:
         io.out(instruction, state)
     elif instruction.instruction_type == InstructionType.IN:
