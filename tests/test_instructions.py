@@ -111,27 +111,56 @@ def test_xor():
 #     state = execute('''
 #     ''')
 #     assert state.i0 == 10
-#
-#
-# # compare & jumps
-# def test_jmp():
-#     state = execute('''
-#     ''')
-#     assert state.i0 == 10
-#
-#
-# def test_je():
-#     state = execute('''
-#     ''')
-#     assert state.i0 == 10
-#
-#
-# def test_jne():
-#     state = execute('''
-#     ''')
-#     assert state.i0 == 10
-#
-#
+
+
+# compare & jumps
+def test_jmp():
+    state = execute('''
+    jmp end
+    mov 1, %i0
+    end:
+    ''')
+    assert state.i0 == 0
+
+
+def test_je():
+    state = execute('''
+    mov 0, %i1
+    mov 0, %i2
+
+    mov 5, %i0
+    je 5, %i0, next
+    mov 1, %i1
+    next:
+
+    mov 6, %i0
+    je 5, %i0, end
+    mov 1, %i2
+    end:
+    ''')
+    assert state.i1 == 0
+    assert state.i2 == 1
+
+
+def test_jne():
+    state = execute('''
+    mov 0, %i1
+    mov 0, %i2
+
+    mov 5, %i0
+    jne 4, %i0, next
+    mov 1, %i1
+    next:
+
+    mov 6, %i0
+    jne 6, %i0, end
+    mov 1, %i2
+    end:
+    ''')
+    assert state.i1 == 0
+    assert state.i2 == 1
+
+
 # # conditional jumps
 # def test_jl():
 #     state = execute('''
