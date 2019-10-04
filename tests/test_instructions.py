@@ -70,30 +70,42 @@ def test_div():
     assert state.i0 == 3
 
 
-# def test_mod():
-#     state = execute('''
-#     ''')
-#     assert state.i0 == 10
-#
-#
-# # binary
-# def test_and():
-#     state = execute('''
-#     ''')
-#     assert state.i0 == 10
-#
-#
-# def test_or():
-#     state = execute('''
-#     ''')
-#     assert state.i0 == 10
-#
-#
-# def test_xor():
-#     state = execute('''
-#     ''')
-#     assert state.i0 == 10
-#
+def test_mod():
+    state = execute('''
+    mov 7, %i1
+    mov 5, %i0
+    mod %i1, %i0
+    ''')
+    assert state.i0 == 2
+
+
+# binary
+def test_and():
+    state = execute('''
+    mov 7, %i1
+    mov 9, %i0
+    and %i1, %i0
+    ''')
+    assert state.i0 == 1
+
+
+def test_or():
+    state = execute('''
+    mov 5, %i1
+    mov 3, %i0
+    or %i1, %i0
+    ''')
+    assert state.i0 == 7
+
+
+def test_xor():
+    state = execute('''
+    mov 5, %i1
+    mov 3, %i0
+    xor %i1, %i0
+    ''')
+    assert state.i0 == 6
+
 #
 # def test_not():
 #     state = execute('''

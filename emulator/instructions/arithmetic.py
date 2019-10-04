@@ -27,6 +27,22 @@ def div(instr: Instruction, state: MachineState):
     _arithmetic(instr, state, lambda a, b: a // b)
 
 
+def mod(instr: Instruction, state: MachineState):
+    _arithmetic(instr, state, lambda a, b: a % b)
+
+
+def or_instr(instr: Instruction, state: MachineState):
+    _arithmetic(instr, state, lambda a, b: a | b)
+
+
+def and_instr(instr: Instruction, state: MachineState):
+    _arithmetic(instr, state, lambda a, b: a & b)
+
+
+def xor(instr: Instruction, state: MachineState):
+    _arithmetic(instr, state, lambda a, b: a ^ b)
+
+
 def inc(instr: Instruction, state: MachineState):
     params = instr.params
     assert len(params) == 1
