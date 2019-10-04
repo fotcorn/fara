@@ -28,7 +28,7 @@ def ld(instr: Instruction, state: MachineState):
         value = bitstruct.unpack('u64', state.memory[address:address+8])
     else:
         raise ValueError('Unknown instruction size')
-    state.set_value(params[1], value, instr.size)
+    state.set_value(params[1], value[0], instr.size)
 
 
 def str_instr(instr: Instruction, state: MachineState):
