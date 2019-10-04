@@ -15,6 +15,10 @@ def dispatch(instruction: Instruction, state: MachineState):
         arithmetic.add(instruction, state)
     elif instruction.instruction_type == InstructionType.SUB:
         arithmetic.sub(instruction, state)
+    elif instruction.instruction_type == InstructionType.MUL:
+        arithmetic.mul(instruction, state)
+    elif instruction.instruction_type == InstructionType.DIV:
+        arithmetic.div(instruction, state)
     elif instruction.instruction_type == InstructionType.INC:
         arithmetic.inc(instruction, state)
     elif instruction.instruction_type == InstructionType.DEC:
