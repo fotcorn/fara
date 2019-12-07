@@ -1,2 +1,0 @@
-lark-parser==0.7.1
-bitstruct==8.0.0
