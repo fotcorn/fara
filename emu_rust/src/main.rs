@@ -4,6 +4,9 @@ use clap::{App, Arg};
 use std::fs::File;
 use std::io::Read;
 
+mod cpu;
+mod decoder;
+mod instruction;
 mod instruction_set;
 mod machine_state;
 
@@ -20,4 +23,10 @@ fn main() {
     let mut ms = machine_state::MachineState::new();
 
     ms.memory[0x1000..0x1000 + buffer.len()].copy_from_slice(&buffer);
+
+    loop {
+        let (instr, offset) = decoder::decode(&ms);
+        ms.pc += offset;
+        cpu::execute(&mut ms, &instr);
+    }
 }
