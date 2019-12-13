@@ -1,6 +1,9 @@
 extern crate clap;
 use clap::{App, Arg};
 
+#[macro_use]
+extern crate num_derive;
+
 use std::fs::File;
 use std::io::Read;
 

@@ -1,3 +1,4 @@
+#[derive(FromPrimitive, ToPrimitive)]
 pub enum InstructionType {
     MOV = 0x0001,
     LD = 0x0002,
@@ -47,6 +48,7 @@ pub enum InstructionType {
     HALT = 0x0801,
 }
 
+#[derive(FromPrimitive, ToPrimitive)]
 pub enum ParameterType {
     Register = 0x1,
     ImmediateOneByte = 0x2,
@@ -55,6 +57,7 @@ pub enum ParameterType {
     ImmediateEightByte = 0x5,
 }
 
+#[derive(FromPrimitive, ToPrimitive)]
 pub enum InstructionSize {
     OneByte = 0x1,
     TwoByte = 0x2,
@@ -62,11 +65,13 @@ pub enum InstructionSize {
     EightByte = 0x4,
 }
 
+#[derive(FromPrimitive, ToPrimitive)]
 pub enum InstructionSignedness {
     Signed = 0x0,
     Unsigned = 0x1,
 }
 
+#[derive(FromPrimitive, ToPrimitive)]
 pub enum Register {
     I0 = 0x01,
     I1 = 0x02,
