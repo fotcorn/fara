@@ -28,18 +28,20 @@ pub fn decode(ms: &MachineState) -> (Instruction, i64) {
     let instr = &ms.memory[ms.pc as usize..=ms.pc as usize + 4];
     let instr = *zero::read::<u32>(instr);
 
-    let instr_type = match InstructionType::from_u32(instr & TYPE >> TYPE_OFFSET) {
+    println!("{}", instr);
+
+    let instr_type = match InstructionType::from_u32((instr & TYPE) >> TYPE_OFFSET) {
         Some(t) => t,
         None => panic!("Invalid instruction type"),
     };
 
-    let instr_size = match InstructionSize::from_u32(instr & SIZE >> SIZE_OFFSET) {
+    let instr_size = match InstructionSize::from_u32((instr & SIZE) >> SIZE_OFFSET) {
         Some(t) => t,
         None => panic!("Invalid instruction type"),
     };
 
     let instr_signedness =
-        match InstructionSignedness::from_u32(instr & SIGNEDNESS >> SIGNEDNESS_OFFSET) {
+        match InstructionSignedness::from_u32((instr & SIGNEDNESS) >> SIGNEDNESS_OFFSET) {
             Some(t) => t,
             None => panic!("Invalid instruction type"),
         };
