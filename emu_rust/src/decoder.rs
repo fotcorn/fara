@@ -2,8 +2,10 @@ extern crate zero;
 
 use num_traits::FromPrimitive;
 
-use crate::instruction::Instruction;
-use crate::instruction_set::{InstructionSignedness, InstructionSize, InstructionType};
+use crate::instruction::{Instruction, InstructionParam};
+use crate::instruction_set::{
+    InstructionSignedness, InstructionSize, InstructionType, ParameterType, Register,
+};
 use crate::machine_state::MachineState;
 
 const TYPE_OFFSET: u32 = 20;
@@ -42,12 +44,69 @@ pub fn decode(ms: &MachineState) -> (Instruction, i64) {
             None => panic!("Invalid instruction type"),
         };
 
-    (
-        Instruction {
-            instruction: instr_type,
-            size: instr_size,
-            signedness: instr_signedness,
-        },
-        5,
-    )
+    let param_types = vec![
+        instr & PARAM1_TYPE >> PARAM1_TYPE_OFFSET,
+        instr & PARAM2_TYPE >> PARAM2_TYPE_OFFSET,
+        instr & PARAM3_TYPE >> PARAM3_TYPE_OFFSET,
+        instr & PARAM4_TYPE >> PARAM4_TYPE_OFFSET,
+    ];
+
+    let mut offset = 4;
+
+    let mut instr = Instruction {
+        instruction: instr_type,
+        size: instr_size,
+        signedness: instr_signedness,
+        params: Vec::new(),
+    };
+
+    for param_type in param_types {
+        let param_type = match ParameterType::from_u32(param_type) {
+            Some(t) => t,
+            None => panic!("Invalid instruction type"),
+        };
+
+        let address = (ms.pc + offset) as usize;
+
+        match param_type {
+            ParameterType::NoParameter => {
+                return (instr, offset);
+            }
+            ParameterType::Register => {
+                let register = &ms.memory[address..=address + 1];
+                let register = *zero::read::<u8>(register);
+                let register = match Register::from_u8(register) {
+                    Some(t) => t,
+                    None => panic!("Invalid register"),
+                };
+                instr.params.push(InstructionParam::Register(register));
+                offset += 1;
+            }
+            ParameterType::ImmediateOneByte => {
+                let value = &ms.memory[address..=address + 1];
+                let value = *zero::read::<u8>(value);
+                instr.params.push(InstructionParam::Immediate(value as i64));
+                offset += 1;
+            }
+            ParameterType::ImmediateTwoByte => {
+                let value = &ms.memory[address..=address + 2];
+                let value = *zero::read::<u16>(value);
+                instr.params.push(InstructionParam::Immediate(value as i64));
+                offset += 2;
+            }
+            ParameterType::ImmediateFourByte => {
+                let value = &ms.memory[address..=address + 4];
+                let value = *zero::read::<u32>(value);
+                instr.params.push(InstructionParam::Immediate(value as i64));
+                offset += 4;
+            }
+            ParameterType::ImmediateEightByte => {
+                let value = &ms.memory[address..=address + 8];
+                let value = *zero::read::<u64>(value);
+                instr.params.push(InstructionParam::Immediate(value as i64));
+                offset += 8;
+            }
+        }
+    }
+    (instr, offset)
 }

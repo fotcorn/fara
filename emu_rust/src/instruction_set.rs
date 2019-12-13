@@ -50,6 +50,7 @@ pub enum InstructionType {
 
 #[derive(FromPrimitive, ToPrimitive)]
 pub enum ParameterType {
+    NoParameter = 0x0,
     Register = 0x1,
     ImmediateOneByte = 0x2,
     ImmediateTwoByte = 0x3,
