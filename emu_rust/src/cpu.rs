@@ -74,7 +74,13 @@ pub fn execute(machine_state: &mut MachineState, instruction: &Instruction) {
 
         // io
         InstructionType::IN => panic!("Not implemented instruction IN"),
-        InstructionType::OUT => panic!("Not implemented instruction OUT"),
+        InstructionType::OUT => {
+            let port = machine_state.get_value(&instruction.params[0], &InstructionSize::OneByte);
+            let value = machine_state.get_value(&instruction.params[1], &InstructionSize::OneByte);
+            if port == 1 {
+                print!("{}", value as u8 as char);
+            }
+        }
 
         // syscalls
         InstructionType::SYSCALL => panic!("Not implemented instruction SYSCALL"),
