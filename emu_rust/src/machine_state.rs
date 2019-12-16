@@ -1,3 +1,5 @@
+use std::convert::TryInto;
+
 use crate::instruction::InstructionParam;
 use crate::instruction_set::{InstructionSize, Register};
 
@@ -82,5 +84,24 @@ impl MachineState {
                 Register::I7 => self.i7 = value,
             },
         };
+    }
+
+    pub fn read_memory1(&self, address: i64) -> i8 {
+        self.memory[address as usize] as i8
+    }
+
+    pub fn read_memory2(&self, address: i64) -> i16 {
+        let value = &self.memory[address as usize..address as usize + 2];
+        i16::from_le_bytes(value.try_into().unwrap())
+    }
+
+    pub fn read_memory4(&self, address: i64) -> i32 {
+        let value = &self.memory[address as usize..address as usize + 4];
+        i32::from_le_bytes(value.try_into().unwrap())
+    }
+
+    pub fn read_memory8(&self, address: i64) -> i64 {
+        let value = &self.memory[address as usize..address as usize + 8];
+        i64::from_le_bytes(value.try_into().unwrap())
     }
 }

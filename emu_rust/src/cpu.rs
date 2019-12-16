@@ -1,5 +1,5 @@
 use crate::instruction::Instruction;
-use crate::instruction_set::InstructionType;
+use crate::instruction_set::{InstructionSize, InstructionType};
 use crate::machine_state::MachineState;
 
 pub fn execute(machine_state: &mut MachineState, instruction: &Instruction) {
@@ -12,7 +12,22 @@ pub fn execute(machine_state: &mut MachineState, instruction: &Instruction) {
             let value = machine_state.get_value(&instruction.params[0], &instruction.size);
             machine_state.set_value(value, &instruction.params[1], &instruction.size);
         }
-        InstructionType::LD => panic!("Not implemented instruction LD"),
+        InstructionType::LD => {
+            assert!(
+                instruction.params.len() == 2,
+                "LD instruction requires two arguments"
+            );
+
+            let address =
+                machine_state.get_value(&instruction.params[0], &InstructionSize::EightByte);
+            let value = match instruction.size {
+                InstructionSize::OneByte => machine_state.read_memory1(address) as i64,
+                InstructionSize::TwoByte => machine_state.read_memory2(address) as i64,
+                InstructionSize::FourByte => machine_state.read_memory4(address) as i64,
+                InstructionSize::EightByte => machine_state.read_memory8(address) as i64,
+            };
+            machine_state.set_value(value, &instruction.params[1], &instruction.size);
+        }
         InstructionType::STR => panic!("Not implemented instruction STR"),
 
         // arithmetic
