@@ -60,7 +60,7 @@ pub fn execute(machine_state: &mut MachineState, instruction: &Instruction) {
         InstructionType::INC => {
             assert!(
                 instruction.params.len() == 1,
-                "INC instruction requires two arguments"
+                "INC instruction requires one argument"
             );
             let value = machine_state.get_value(&instruction.params[0], &instruction.size);
             let result = value + 1;
@@ -69,7 +69,7 @@ pub fn execute(machine_state: &mut MachineState, instruction: &Instruction) {
         InstructionType::DEC => {
             assert!(
                 instruction.params.len() == 1,
-                "DEC instruction requires two arguments"
+                "DEC instruction requires one argument"
             );
             let value = machine_state.get_value(&instruction.params[0], &instruction.size);
             let result = value - 1;
@@ -94,18 +94,39 @@ pub fn execute(machine_state: &mut MachineState, instruction: &Instruction) {
             machine_state.set_value(result, &instruction.params[1], &instruction.size);
         }
 
-        // binary
-        InstructionType::AND => panic!("Not implemented instruction AND"),
-        InstructionType::OR => panic!("Not implemented instruction OR"),
-        InstructionType::XOR => panic!("Not implemented instruction XOR"),
-        InstructionType::NOT => panic!("Not implemented instruction NOT"),
+        // bitwise
+        InstructionType::AND => {
+            let (value1, value2) =
+                cpu_utils::get_two_params_value(&instruction, &machine_state, "AND");
+            let result = value1 & value2;
+            machine_state.set_value(result, &instruction.params[1], &instruction.size);
+        }
+        InstructionType::OR => {
+            let (value1, value2) =
+                cpu_utils::get_two_params_value(&instruction, &machine_state, "OR");
+            let result = value1 | value2;
+            machine_state.set_value(result, &instruction.params[1], &instruction.size);
+        }
+        InstructionType::XOR => {
+            let (value1, value2) =
+                cpu_utils::get_two_params_value(&instruction, &machine_state, "XOR");
+            let result = value1 ^ value2;
+            machine_state.set_value(result, &instruction.params[1], &instruction.size);
+        }
+        InstructionType::NOT => {
+            assert!(
+                instruction.params.len() == 1,
+                "NOT instruction requires one argument"
+            );
+            let value = machine_state.get_value(&instruction.params[0], &instruction.size);
+            let result = !value;
+            machine_state.set_value(result, &instruction.params[0], &instruction.size);
+        }
 
-        // compare & jumps
+        // jumps
         InstructionType::JMP => panic!("Not implemented instruction JMP"),
         InstructionType::JE => panic!("Not implemented instruction JE"),
         InstructionType::JNE => panic!("Not implemented instruction JNE"),
-
-        // conditional jumps
         InstructionType::JL => panic!("Not implemented instruction JL"),
         InstructionType::JLE => panic!("Not implemented instruction JLE"),
         InstructionType::JG => panic!("Not implemented instruction JG"),
