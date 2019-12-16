@@ -28,7 +28,17 @@ pub fn execute(machine_state: &mut MachineState, instruction: &Instruction) {
             };
             machine_state.set_value(value, &instruction.params[1], &instruction.size);
         }
-        InstructionType::STR => panic!("Not implemented instruction STR"),
+        InstructionType::STR => {
+            let value = machine_state.get_value(&instruction.params[0], &instruction.size);
+            let address =
+                machine_state.get_value(&instruction.params[1], &InstructionSize::EightByte);
+            match instruction.size {
+                InstructionSize::OneByte => machine_state.write_memory1(address, value as i8),
+                InstructionSize::TwoByte => machine_state.write_memory2(address, value as i16),
+                InstructionSize::FourByte => machine_state.write_memory4(address, value as i32),
+                InstructionSize::EightByte => machine_state.write_memory8(address, value),
+            };
+        }
 
         // arithmetic
         InstructionType::ADD => panic!("Not implemented instruction ADD"),

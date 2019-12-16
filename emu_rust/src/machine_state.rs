@@ -104,4 +104,17 @@ impl MachineState {
         let value = &self.memory[address as usize..address as usize + 8];
         i64::from_le_bytes(value.try_into().unwrap())
     }
+
+    pub fn write_memory1(&mut self, address: i64, value: i8) {
+        self.memory[address as usize] = value as u8;
+    }
+    pub fn write_memory2(&mut self, address: i64, value: i16) {
+        self.memory[address as usize..address as usize + 2].copy_from_slice(&value.to_le_bytes());
+    }
+    pub fn write_memory4(&mut self, address: i64, value: i32) {
+        self.memory[address as usize..address as usize + 4].copy_from_slice(&value.to_le_bytes());
+    }
+    pub fn write_memory8(&mut self, address: i64, value: i64) {
+        self.memory[address as usize..address as usize + 8].copy_from_slice(&value.to_le_bytes());
+    }
 }
