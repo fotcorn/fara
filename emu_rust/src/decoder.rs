@@ -89,21 +89,21 @@ pub fn decode(ms: &MachineState) -> (Instruction, i64) {
             ParameterType::ImmediateTwoByte => {
                 let value = &ms.memory[address..address + 2];
                 let value = value.try_into().unwrap();
-                let value = u16::from_be_bytes(value);
+                let value = i16::from_be_bytes(value);
                 instr.params.push(InstructionParam::Immediate(value as i64));
                 offset += 2;
             }
             ParameterType::ImmediateFourByte => {
                 let value = &ms.memory[address..address + 4];
                 let value = value.try_into().unwrap();
-                let value = u32::from_be_bytes(value);
+                let value = i32::from_be_bytes(value);
                 instr.params.push(InstructionParam::Immediate(value as i64));
                 offset += 4;
             }
             ParameterType::ImmediateEightByte => {
                 let value = &ms.memory[address..address + 8];
                 let value = value.try_into().unwrap();
-                let value = u64::from_be_bytes(value);
+                let value = i64::from_be_bytes(value);
                 instr.params.push(InstructionParam::Immediate(value as i64));
                 offset += 8;
             }
