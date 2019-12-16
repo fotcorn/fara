@@ -124,9 +124,40 @@ pub fn execute(machine_state: &mut MachineState, instruction: &Instruction) {
         }
 
         // jumps
-        InstructionType::JMP => panic!("Not implemented instruction JMP"),
-        InstructionType::JE => panic!("Not implemented instruction JE"),
-        InstructionType::JNE => panic!("Not implemented instruction JNE"),
+        InstructionType::JMP => {
+            assert!(
+                instruction.params.len() == 1,
+                "JMP instruction requires one argument"
+            );
+            let jump_offset = machine_state.get_value(&instruction.params[0], &instruction.size);
+            machine_state.pc += jump_offset;
+        }
+        InstructionType::JE => {
+            assert!(
+                instruction.params.len() == 3,
+                "JE instruction requires three argument"
+            );
+            let value1 = machine_state.get_value(&instruction.params[0], &instruction.size);
+            let value2 = machine_state.get_value(&instruction.params[1], &instruction.size);
+            if value1 == value2 {
+                let jump_offset =
+                    machine_state.get_value(&instruction.params[2], &instruction.size);
+                machine_state.pc += jump_offset;
+            }
+        }
+        InstructionType::JNE => {
+            assert!(
+                instruction.params.len() == 3,
+                "JNE instruction requires three argument"
+            );
+            let value1 = machine_state.get_value(&instruction.params[0], &instruction.size);
+            let value2 = machine_state.get_value(&instruction.params[1], &instruction.size);
+            if value1 != value2 {
+                let jump_offset =
+                    machine_state.get_value(&instruction.params[2], &instruction.size);
+                machine_state.pc += jump_offset;
+            }
+        }
         InstructionType::JL => panic!("Not implemented instruction JL"),
         InstructionType::JLE => panic!("Not implemented instruction JLE"),
         InstructionType::JG => panic!("Not implemented instruction JG"),
