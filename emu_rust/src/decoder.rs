@@ -45,10 +45,10 @@ pub fn decode(ms: &MachineState) -> (Instruction, i64) {
         };
 
     let param_types = vec![
-        instr & PARAM1_TYPE >> PARAM1_TYPE_OFFSET,
-        instr & PARAM2_TYPE >> PARAM2_TYPE_OFFSET,
-        instr & PARAM3_TYPE >> PARAM3_TYPE_OFFSET,
-        instr & PARAM4_TYPE >> PARAM4_TYPE_OFFSET,
+        (instr & PARAM1_TYPE) >> PARAM1_TYPE_OFFSET,
+        (instr & PARAM2_TYPE) >> PARAM2_TYPE_OFFSET,
+        (instr & PARAM3_TYPE) >> PARAM3_TYPE_OFFSET,
+        (instr & PARAM4_TYPE) >> PARAM4_TYPE_OFFSET,
     ];
 
     let mut offset = 4;
