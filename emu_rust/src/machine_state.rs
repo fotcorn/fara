@@ -17,6 +17,8 @@ pub struct MachineState {
     pub sp: i64,
 
     pub memory: Vec<u8>,
+
+    pub halt: bool,
 }
 
 impl MachineState {
@@ -34,6 +36,8 @@ impl MachineState {
             pc: 0x1000,
             sp: 0x0,
             memory: vec![0; 0x10000],
+
+            halt: false,
         }
     }
 

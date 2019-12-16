@@ -87,6 +87,8 @@ pub fn execute(machine_state: &mut MachineState, instruction: &Instruction) {
         InstructionType::SYSRET => panic!("Not implemented instruction SYSRET"),
 
         // other
-        InstructionType::HALT => panic!("Not implemented instruction HALT"),
+        InstructionType::HALT => {
+            machine_state.halt = true;
+        }
     }
 }

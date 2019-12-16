@@ -31,5 +31,8 @@ fn main() {
         let (instr, offset) = decoder::decode(&ms);
         ms.pc += offset;
         cpu::execute(&mut ms, &instr);
+        if ms.halt {
+            break;
+        }
     }
 }
