@@ -4,7 +4,14 @@ use crate::machine_state::MachineState;
 
 pub fn execute(machine_state: &mut MachineState, instruction: &Instruction) {
     match instruction.instruction {
-        InstructionType::MOV => panic!("Not implemented instruction MOV"),
+        InstructionType::MOV => {
+            assert!(
+                instruction.params.len() == 2,
+                "MOV instruction requires two arguments"
+            );
+            let value = machine_state.get_value(&instruction.params[0], &instruction.size);
+            machine_state.set_value(value, &instruction.params[1], &instruction.size);
+        }
         InstructionType::LD => panic!("Not implemented instruction LD"),
         InstructionType::STR => panic!("Not implemented instruction STR"),
 
