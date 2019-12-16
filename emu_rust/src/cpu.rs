@@ -1,6 +1,6 @@
 use crate::cpu_utils;
 use crate::instruction::Instruction;
-use crate::instruction_set::{InstructionSize, InstructionType};
+use crate::instruction_set::{InstructionSignedness, InstructionSize, InstructionType};
 use crate::machine_state::MachineState;
 
 pub fn execute(machine_state: &mut MachineState, instruction: &Instruction) {
@@ -129,39 +129,78 @@ pub fn execute(machine_state: &mut MachineState, instruction: &Instruction) {
                 instruction.params.len() == 1,
                 "JMP instruction requires one argument"
             );
-            let jump_offset = machine_state.get_value(&instruction.params[0], &instruction.size);
-            machine_state.pc += jump_offset;
+            cpu_utils::conditional_jump(true, machine_state, &instruction.params[0]);
         }
         InstructionType::JE => {
             assert!(
                 instruction.params.len() == 3,
-                "JE instruction requires three argument"
+                "JE instruction requires three arguments"
             );
             let value1 = machine_state.get_value(&instruction.params[0], &instruction.size);
             let value2 = machine_state.get_value(&instruction.params[1], &instruction.size);
-            if value1 == value2 {
-                let jump_offset =
-                    machine_state.get_value(&instruction.params[2], &instruction.size);
-                machine_state.pc += jump_offset;
-            }
+            cpu_utils::conditional_jump(value1 == value2, machine_state, &instruction.params[2]);
         }
         InstructionType::JNE => {
             assert!(
                 instruction.params.len() == 3,
-                "JNE instruction requires three argument"
+                "JNE instruction requires three arguments"
             );
             let value1 = machine_state.get_value(&instruction.params[0], &instruction.size);
             let value2 = machine_state.get_value(&instruction.params[1], &instruction.size);
-            if value1 != value2 {
-                let jump_offset =
-                    machine_state.get_value(&instruction.params[2], &instruction.size);
-                machine_state.pc += jump_offset;
-            }
+            cpu_utils::conditional_jump(value1 != value2, machine_state, &instruction.params[2]);
         }
-        InstructionType::JL => panic!("Not implemented instruction JL"),
-        InstructionType::JLE => panic!("Not implemented instruction JLE"),
-        InstructionType::JG => panic!("Not implemented instruction JG"),
-        InstructionType::JGE => panic!("Not implemented instruction JGE"),
+        InstructionType::JL => {
+            assert!(
+                instruction.params.len() == 3,
+                "JL instruction requires three arguments"
+            );
+            let value1 = machine_state.get_value(&instruction.params[0], &instruction.size);
+            let value2 = machine_state.get_value(&instruction.params[1], &instruction.size);
+            let result = match instruction.signedness {
+                InstructionSignedness::Signed => value1 < value2,
+                InstructionSignedness::Unsigned => (value1 as u64) < (value2 as u64),
+            };
+            cpu_utils::conditional_jump(result, machine_state, &instruction.params[2]);
+        }
+        InstructionType::JLE => {
+            assert!(
+                instruction.params.len() == 3,
+                "JLE instruction requires three arguments"
+            );
+            let value1 = machine_state.get_value(&instruction.params[0], &instruction.size);
+            let value2 = machine_state.get_value(&instruction.params[1], &instruction.size);
+            let result = match instruction.signedness {
+                InstructionSignedness::Signed => value1 <= value2,
+                InstructionSignedness::Unsigned => (value1 as u64) <= (value2 as u64),
+            };
+            cpu_utils::conditional_jump(result, machine_state, &instruction.params[2]);
+        }
+        InstructionType::JG => {
+            assert!(
+                instruction.params.len() == 3,
+                "JG instruction requires three arguments"
+            );
+            let value1 = machine_state.get_value(&instruction.params[0], &instruction.size);
+            let value2 = machine_state.get_value(&instruction.params[1], &instruction.size);
+            let result = match instruction.signedness {
+                InstructionSignedness::Signed => value1 > value2,
+                InstructionSignedness::Unsigned => (value1 as u64) > (value2 as u64),
+            };
+            cpu_utils::conditional_jump(result, machine_state, &instruction.params[2]);
+        }
+        InstructionType::JGE => {
+            assert!(
+                instruction.params.len() == 3,
+                "JGE instruction requires three arguments"
+            );
+            let value1 = machine_state.get_value(&instruction.params[0], &instruction.size);
+            let value2 = machine_state.get_value(&instruction.params[1], &instruction.size);
+            let result = match instruction.signedness {
+                InstructionSignedness::Signed => value1 >= value2,
+                InstructionSignedness::Unsigned => (value1 as u64) >= (value2 as u64),
+            };
+            cpu_utils::conditional_jump(result, machine_state, &instruction.params[2]);
+        }
 
         // stack
         InstructionType::PUSH => panic!("Not implemented instruction PUSH"),
