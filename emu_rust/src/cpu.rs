@@ -203,9 +203,41 @@ pub fn execute(machine_state: &mut MachineState, instruction: &Instruction) {
         }
 
         // stack
-        InstructionType::PUSH => panic!("Not implemented instruction PUSH"),
+        InstructionType::PUSH => {
+            assert!(
+                instruction.params.len() == 1,
+                "PUSH instruction requires one argument"
+            );
+            let value = machine_state.get_value(&instruction.params[0], &instruction.size);
+            match instruction.size {
+                InstructionSize::OneByte => {
+                    machine_state.write_memory1(machine_state.sp, value as i8);
+                    machine_state.sp += 1;
+                }
+                InstructionSize::TwoByte => {
+                    machine_state.write_memory2(machine_state.sp, value as i16);
+                    machine_state.sp += 2;
+                }
+                InstructionSize::FourByte => {
+                    machine_state.write_memory4(machine_state.sp, value as i32);
+                    machine_state.sp += 4;
+                }
+                InstructionSize::EightByte => {
+                    machine_state.write_memory8(machine_state.sp, value);
+                    machine_state.sp += 8;
+                }
+            };
+        }
         InstructionType::POP => panic!("Not implemented instruction POP"),
-        InstructionType::CALL => panic!("Not implemented instruction CALL"),
+        InstructionType::CALL => {
+            assert!(
+                instruction.params.len() == 1,
+                "CALL instruction requires one argument"
+            );
+            machine_state.write_memory8(machine_state.sp, machine_state.pc);
+            machine_state.sp += 8;
+            cpu_utils::conditional_jump(true, machine_state, &instruction.params[0]);
+        }
         InstructionType::RET => panic!("Not implemented instruction RET"),
 
         // io
