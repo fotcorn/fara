@@ -8,6 +8,7 @@ use std::fs::File;
 use std::io::Read;
 
 mod cpu;
+mod cpu_utils;
 mod decoder;
 mod instruction;
 mod instruction_set;

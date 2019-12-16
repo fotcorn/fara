@@ -1,3 +1,4 @@
+use crate::cpu_utils;
 use crate::instruction::Instruction;
 use crate::instruction_set::{InstructionSize, InstructionType};
 use crate::machine_state::MachineState;
@@ -17,7 +18,6 @@ pub fn execute(machine_state: &mut MachineState, instruction: &Instruction) {
                 instruction.params.len() == 2,
                 "LD instruction requires two arguments"
             );
-
             let address =
                 machine_state.get_value(&instruction.params[0], &InstructionSize::EightByte);
             let value = match instruction.size {
@@ -29,6 +29,10 @@ pub fn execute(machine_state: &mut MachineState, instruction: &Instruction) {
             machine_state.set_value(value, &instruction.params[1], &instruction.size);
         }
         InstructionType::STR => {
+            assert!(
+                instruction.params.len() == 2,
+                "STR instruction requires two arguments"
+            );
             let value = machine_state.get_value(&instruction.params[0], &instruction.size);
             let address =
                 machine_state.get_value(&instruction.params[1], &InstructionSize::EightByte);
@@ -41,13 +45,54 @@ pub fn execute(machine_state: &mut MachineState, instruction: &Instruction) {
         }
 
         // arithmetic
-        InstructionType::ADD => panic!("Not implemented instruction ADD"),
-        InstructionType::SUB => panic!("Not implemented instruction SUB"),
-        InstructionType::INC => panic!("Not implemented instruction INC"),
-        InstructionType::DEC => panic!("Not implemented instruction DEC"),
-        InstructionType::DIV => panic!("Not implemented instruction DIV"),
-        InstructionType::MUL => panic!("Not implemented instruction MUL"),
-        InstructionType::MOD => panic!("Not implemented instruction MOD"),
+        InstructionType::ADD => {
+            let (value1, value2) =
+                cpu_utils::get_two_params_value(&instruction, &machine_state, "ADD");
+            let result = value1 + value2;
+            machine_state.set_value(result, &instruction.params[1], &instruction.size);
+        }
+        InstructionType::SUB => {
+            let (value1, value2) =
+                cpu_utils::get_two_params_value(&instruction, &machine_state, "SUB");
+            let result = value1 - value2;
+            machine_state.set_value(result, &instruction.params[1], &instruction.size);
+        }
+        InstructionType::INC => {
+            assert!(
+                instruction.params.len() == 1,
+                "INC instruction requires two arguments"
+            );
+            let value = machine_state.get_value(&instruction.params[0], &instruction.size);
+            let result = value + 1;
+            machine_state.set_value(result, &instruction.params[0], &instruction.size);
+        }
+        InstructionType::DEC => {
+            assert!(
+                instruction.params.len() == 1,
+                "DEC instruction requires two arguments"
+            );
+            let value = machine_state.get_value(&instruction.params[0], &instruction.size);
+            let result = value - 1;
+            machine_state.set_value(result, &instruction.params[0], &instruction.size);
+        }
+        InstructionType::DIV => {
+            let (value1, value2) =
+                cpu_utils::get_two_params_value(&instruction, &machine_state, "DIV");
+            let result = value1 / value2;
+            machine_state.set_value(result, &instruction.params[1], &instruction.size);
+        }
+        InstructionType::MUL => {
+            let (value1, value2) =
+                cpu_utils::get_two_params_value(&instruction, &machine_state, "MUL");
+            let result = value1 * value2;
+            machine_state.set_value(result, &instruction.params[1], &instruction.size);
+        }
+        InstructionType::MOD => {
+            let (value1, value2) =
+                cpu_utils::get_two_params_value(&instruction, &machine_state, "MOD");
+            let result = value1 % value2;
+            machine_state.set_value(result, &instruction.params[1], &instruction.size);
+        }
 
         // binary
         InstructionType::AND => panic!("Not implemented instruction AND"),
