@@ -264,8 +264,8 @@ pub fn execute(machine_state: &mut MachineState, instruction: &Instruction) {
         }
         InstructionType::RET => {
             assert!(
-                instruction.params.len() == 1,
-                "RET instruction requires one argument"
+                instruction.params.len() == 0,
+                "RET instruction does not take any arguemnts"
             );
             let value = match instruction.size {
                 InstructionSize::OneByte => {
