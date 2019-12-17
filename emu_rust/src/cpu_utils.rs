@@ -19,9 +19,6 @@ pub fn get_two_params_value(
 pub fn conditional_jump(result: bool, machine_state: &mut MachineState, param: &InstructionParam) {
     if result {
         let jump_offset = machine_state.get_value(param, &InstructionSize::EightByte);
-        println!();
-        println!("{}", jump_offset);
-        println!();
         machine_state.pc += jump_offset;
     }
 }
