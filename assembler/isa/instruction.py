@@ -1,6 +1,6 @@
 from typing import Union, List
 
-from isa.instruction_set import InstructionType, ParameterType, Register, InstructionSignedness, InstructionSize
+from isa.instruction_set import InstructionType, ParameterType, Register, InstructionSize
 
 
 class InstructionParam:
@@ -31,15 +31,14 @@ class InstructionParam:
 
 
 class Instruction:
-    def __init__(self, instruction_type: InstructionType, size: InstructionSize, signedness: InstructionSignedness,
+    def __init__(self, instruction_type: InstructionType, size: InstructionSize,
                  params: List[InstructionParam]):
         self.instruction_type = instruction_type
         self.params = params
         self.size = size
-        self.signedness = signedness
 
     def __str__(self):
-        instruction = '{}{}{}'.format(self.instruction_type.name.lower(), self.size, self.signedness)
+        instruction = '{}{}{}'.format(self.instruction_type.name.lower(), self.size)
         if self.params:
             return instruction + ' ' + ', '.join([str(param) for param in self.params])
         else:
