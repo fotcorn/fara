@@ -33,7 +33,7 @@
 
 - jls: Jump if lower (signed compare)
 - jles: Jump if lower or equal (signed compare)
-- jgsu: Jump if greater (signed compare)
+- jgs: Jump if greater (signed compare)
 - jges: Jump if greater or equal (signed compare)
 
 ### unsigned

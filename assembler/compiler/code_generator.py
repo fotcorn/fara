@@ -52,11 +52,10 @@ def generate_code(tree: List[Instruction]):
                     elif param.parameter_type == ParameterType.REGISTER:
                         param_data += bitstruct.pack('u8', param.value.value)
 
-            # 14 bits instruction type, 3 bits data size, 1 bit signedness
-            code += bitstruct.pack('u12u3u1' + 'u4u4u4u4',
+            # 14 bits instruction type, 4 bits data size
+            code += bitstruct.pack('u12u4' + 'u4u4u4u4',
                                    instruction.instruction_type.value,
                                    instruction.size.value,
-                                   instruction.signedness.value,
                                    *param_types)
             code += param_data
 

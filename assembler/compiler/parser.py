@@ -1,7 +1,7 @@
 import sys
 import codecs
 from lark import Lark, Transformer, v_args, Token
-from isa.instruction_set import Register, InstructionType, InstructionSize, InstructionSignedness
+from isa.instruction_set import Register, InstructionType, InstructionSize
 from isa.instruction import InstructionParam, ParameterType, Instruction
 import ctypes
 
@@ -16,8 +16,7 @@ GRAMMAR = '''start: (_statement? COMMENT? NEWLINE)* _statement? _NEWLINE?
             ?param: (number|register|label_ref|char|escape_char)
 
             INSTRUCTION_SIZE: ("1"|"2"|"4"|"8")
-            INSTRUCTION_SIGNEDNESS: ("u"|"s")
-            instruction: WORD INSTRUCTION_SIZE? INSTRUCTION_SIGNEDNESS?
+            instruction: WORD INSTRUCTION_SIZE?
             expression: instruction (_whitespace param (","param)*)?
             label: CNAME":"
 
@@ -85,40 +84,24 @@ class ASMTransformer(Transformer):
         return InstructionParam(ParameterType.REGISTER, Register(int(register) + 1))
 
     def instruction(self, args):
+        assert len(args) <= 2
+
         instruction = args[0].value.upper()
         try:
             instruction_type = InstructionType[instruction]
         except KeyError:
-            if instruction[-1] in ['U', 'S']:
-                try:
-                    instruction_type = InstructionType[instruction[:-1]]
-                    args.append(Token('INSTRUCTION_SIGNEDNESS', instruction[-1].lower()))
-                except KeyError:
-                    raise ValueError(f'Unknown instruction: {instruction.lower()}')
-            else:
-                raise ValueError(f'Unknown instruction: {instruction.lower()}')
+            raise ValueError(f'Unknown instruction: {instruction.lower()}')
 
         if len(args) == 1:
             size = InstructionSize.EIGHT_BYTE
-            signedness = InstructionSignedness.SIGNED
-        elif len(args) == 2:
-            if args[1].type == 'INSTRUCTION_SIZE':
-                size = InstructionSize.from_string(args[1].value)
-                signedness = InstructionSignedness.SIGNED
-            elif args[1].type == 'INSTRUCTION_SIGNEDNESS':
-                size = InstructionSize.EIGHT_BYTE
-                signedness = InstructionSignedness.from_string(args[1].value)
-            else:
-                raise ValueError('Internal compiler error: invalid parameter type')
         else:
             size = InstructionSize.from_string(args[1].value)
-            signedness = InstructionSignedness.from_string(args[2].value)
-        return instruction_type, size, signedness
+        return instruction_type, size
 
     def expression(self, args):
         self.instruction_counter += 1
-        (instruction_type, size, signedness), *params = args
-        return Instruction(instruction_type, size, signedness, params)
+        (instruction_type, size), *params = args
+        return Instruction(instruction_type, size, params)
 
     @v_args(inline=True)
     def label_ref(self, label):

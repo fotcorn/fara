@@ -25,10 +25,14 @@ pub enum InstructionType {
     JNE = 0x0303,
 
     // conditional jumps
-    JL = 0x0401,
-    JLE = 0x0402,
-    JG = 0x0403,
-    JGE = 0x0404,
+    JLS = 0x0401,
+    JLU = 0x0402,
+    JLES = 0x0403,
+    JLEU = 0x0404,
+    JGS = 0x0405,
+    JGU = 0x0406,
+    JGES = 0x0407,
+    JGEU = 0x0408,
 
     // stack
     PUSH = 0x0501,
@@ -64,12 +68,6 @@ pub enum InstructionSize {
     TwoByte = 0x2,
     FourByte = 0x3,
     EightByte = 0x4,
-}
-
-#[derive(FromPrimitive, ToPrimitive)]
-pub enum InstructionSignedness {
-    Signed = 0x0,
-    Unsigned = 0x1,
 }
 
 #[derive(FromPrimitive, ToPrimitive)]
