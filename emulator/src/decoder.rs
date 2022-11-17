@@ -6,19 +6,17 @@ use crate::machine_state::MachineState;
 
 use std::convert::TryInto;
 
-const TYPE_OFFSET: u32 = 20;
-const SIZE_OFFSET: u32 = 16;
-const PARAM1_TYPE_OFFSET: u32 = 12;
-const PARAM2_TYPE_OFFSET: u32 = 8;
-const PARAM3_TYPE_OFFSET: u32 = 4;
-const PARAM4_TYPE_OFFSET: u32 = 0;
+const TYPE_OFFSET: u32 = 16;
+const SIZE_OFFSET: u32 = 12;
+const PARAM1_TYPE_OFFSET: u32 = 8;
+const PARAM2_TYPE_OFFSET: u32 = 4;
+const PARAM3_TYPE_OFFSET: u32 = 0;
 
-const TYPE: u32 = 0b111111111111 << TYPE_OFFSET;
+const TYPE: u32 = 0xFFFF << TYPE_OFFSET;
 const SIZE: u32 = 0b1111 << SIZE_OFFSET;
 const PARAM1_TYPE: u32 = 0b1111 << PARAM1_TYPE_OFFSET;
 const PARAM2_TYPE: u32 = 0b1111 << PARAM2_TYPE_OFFSET;
 const PARAM3_TYPE: u32 = 0b1111 << PARAM3_TYPE_OFFSET;
-const PARAM4_TYPE: u32 = 0b1111 << PARAM4_TYPE_OFFSET;
 
 pub fn decode(ms: &MachineState) -> (Instruction, i64) {
     let instr = &ms.memory[ms.pc as usize..ms.pc as usize + 4];
@@ -38,7 +36,6 @@ pub fn decode(ms: &MachineState) -> (Instruction, i64) {
         (instr & PARAM1_TYPE) >> PARAM1_TYPE_OFFSET,
         (instr & PARAM2_TYPE) >> PARAM2_TYPE_OFFSET,
         (instr & PARAM3_TYPE) >> PARAM3_TYPE_OFFSET,
-        (instr & PARAM4_TYPE) >> PARAM4_TYPE_OFFSET,
     ];
 
     let mut offset = 4;

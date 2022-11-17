@@ -30,7 +30,7 @@ fn main() {
         .get_matches();
     let filename = matches.value_of("file").unwrap();
     let symbol = matches.value_of("symbol").unwrap_or("main");
-    let loader = matches.value_of("loader").unwrap_or("elf");
+    let loader = matches.value_of("loader").unwrap_or("bin");
 
     match loader {
         "elf" => {

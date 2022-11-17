@@ -14,7 +14,7 @@ def generate_code(tree: List[Instruction]):
     for tree_entry in tree:
         if isinstance(tree_entry, Instruction):
             instruction = tree_entry
-            assert len(instruction.params) <= 4
+            assert len(instruction.params) <= 3
 
             param_types = []
             param_data = b''
@@ -22,7 +22,7 @@ def generate_code(tree: List[Instruction]):
 
             # an instruction can have up to 3 parameters
             # parameter types are appended after instruction type which is 2 bytes long
-            for i in range(4):
+            for i in range(3):
                 try:
                     param = instruction.params[i]
                 except IndexError:
@@ -52,8 +52,8 @@ def generate_code(tree: List[Instruction]):
                     elif param.parameter_type == ParameterType.REGISTER:
                         param_data += bitstruct.pack('u8', param.value.value)
 
-            # 14 bits instruction type, 4 bits data size
-            code += bitstruct.pack('u12u4' + 'u4u4u4u4',
+            # 16 bits instruction type, 4 bits data size, 3x 4bit parameter types
+            code += bitstruct.pack('u16' + 'u4' + 'u4u4u4',
                                    instruction.instruction_type.value,
                                    instruction.size.value,
                                    *param_types)
