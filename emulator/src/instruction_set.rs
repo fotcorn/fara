@@ -1,4 +1,5 @@
 #[derive(FromPrimitive, ToPrimitive)]
+#[derive(Debug)]
 pub enum InstructionType {
     MOV = 0x0001,
     LD = 0x0002,
@@ -53,6 +54,7 @@ pub enum InstructionType {
 }
 
 #[derive(FromPrimitive, ToPrimitive)]
+#[derive(Debug)]
 pub enum ParameterType {
     NoParameter = 0x0,
     Register = 0x1,
@@ -63,6 +65,7 @@ pub enum ParameterType {
 }
 
 #[derive(FromPrimitive, ToPrimitive)]
+#[derive(Debug)]
 pub enum InstructionSize {
     OneByte = 0x1,
     TwoByte = 0x2,
@@ -71,6 +74,7 @@ pub enum InstructionSize {
 }
 
 #[derive(FromPrimitive, ToPrimitive)]
+#[derive(Debug)]
 pub enum Register {
     I0 = 0x01,
     I1 = 0x02,
