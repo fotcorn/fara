@@ -27,9 +27,10 @@ pub fn decode(ms: &MachineState) -> (Instruction, i64) {
         None => panic!("Invalid instruction type"),
     };
 
-    let instr_size = match InstructionSize::from_u32((instr & SIZE) >> SIZE_OFFSET) {
+    let instr_size = (instr & SIZE) >> SIZE_OFFSET;
+    let instr_size = match InstructionSize::from_u32(instr_size) {
         Some(t) => t,
-        None => panic!("Invalid instruction type"),
+        None => panic!("Invalid instruction size {:?}", instr_size),
     };
 
     let param_types = vec![
