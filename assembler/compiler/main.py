@@ -13,8 +13,8 @@ def main():
     if len(sys.argv) != 2:
         print(f'{sys.argv[0]} <file.asm>')
         sys.exit(1)
-    if not sys.argv[1].endswith('.asm'):
-        print(f'Input files need a .asm file extensions')
+    if not sys.argv[1].endswith('.asm') and not sys.argv[1].endswith('.s'):
+        print(f'Input files need a .asm or .s file extensions')
         sys.exit(1)
 
     with open(sys.argv[1]) as f:
