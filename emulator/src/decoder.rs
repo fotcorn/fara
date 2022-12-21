@@ -22,9 +22,10 @@ pub fn decode(ms: &MachineState) -> (Instruction, i64) {
     let instr = &ms.memory[ms.pc as usize..ms.pc as usize + 4];
     let instr = u32::from_be_bytes(instr.try_into().unwrap());
 
-    let instr_type = match InstructionType::from_u32((instr & TYPE) >> TYPE_OFFSET) {
+    let instr_type = (instr & TYPE) >> TYPE_OFFSET;
+    let instr_type = match InstructionType::from_u32(instr_type) {
         Some(t) => t,
-        None => panic!("Invalid instruction type"),
+        None => panic!("Invalid instruction type: {:x}", instr_type),
     };
 
     let instr_size = (instr & SIZE) >> SIZE_OFFSET;
