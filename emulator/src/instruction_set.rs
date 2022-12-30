@@ -1,5 +1,4 @@
-#[derive(FromPrimitive, ToPrimitive)]
-#[derive(Debug)]
+#[derive(FromPrimitive, ToPrimitive, Debug)]
 pub enum InstructionType {
     MOV = 0x0001,
     LD = 0x0002,
@@ -53,8 +52,7 @@ pub enum InstructionType {
     HALT = 0x0801,
 }
 
-#[derive(FromPrimitive, ToPrimitive)]
-#[derive(Debug)]
+#[derive(FromPrimitive, ToPrimitive, Debug)]
 pub enum ParameterType {
     NoParameter = 0x0,
     Register = 0x1,
@@ -64,8 +62,7 @@ pub enum ParameterType {
     ImmediateEightByte = 0x5,
 }
 
-#[derive(FromPrimitive, ToPrimitive)]
-#[derive(Debug)]
+#[derive(FromPrimitive, ToPrimitive, Debug)]
 pub enum InstructionSize {
     OneByte = 0x1,
     TwoByte = 0x2,
@@ -73,15 +70,39 @@ pub enum InstructionSize {
     EightByte = 0x4,
 }
 
-#[derive(FromPrimitive, ToPrimitive)]
-#[derive(Debug)]
+#[derive(FromPrimitive, ToPrimitive, Debug)]
 pub enum Register {
-    I0 = 0x01,
-    I1 = 0x02,
-    I2 = 0x03,
-    I3 = 0x04,
-    I4 = 0x05,
-    I5 = 0x06,
-    I6 = 0x07,
-    I7 = 0x08,
+    PC = 0x01, // program counter
+    SP = 0x02, // stack pointer
+    FP = 0x03, // frame pointer
+
+    // caller saved, function arguments
+    I0 = 0x04, // return value & argument 1
+    I1 = 0x05,
+    I2 = 0x06,
+    I3 = 0x07,
+    I4 = 0x08,
+    I5 = 0x09,
+    I6 = 0x0A,
+    I7 = 0x0B,
+
+    // caller saved, temporaries
+    I8 = 0x0C,
+    I9 = 0x0D,
+    I10 = 0x0E,
+    I11 = 0x0F,
+    I12 = 0x10,
+    I13 = 0x11,
+    I14 = 0x12,
+    I15 = 0x13,
+
+    // callee saved
+    I16 = 0x14,
+    I17 = 0x15,
+    I18 = 0x16,
+    I19 = 0x17,
+    I20 = 0x18,
+    I21 = 0x19,
+    I22 = 0x1A,
+    I23 = 0x1B,
 }
