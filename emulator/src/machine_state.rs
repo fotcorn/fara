@@ -35,7 +35,7 @@ impl MachineState {
             i7: 0,
 
             pc: 0x1000,
-            sp: 0x0,
+            sp: 0x10000, // stack is at the end of the memory, growing down
             fp: 0x0,
             memory: vec![0; 0x10000],
 

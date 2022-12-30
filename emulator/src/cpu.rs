@@ -240,19 +240,19 @@ pub fn execute(machine_state: &mut MachineState, instruction: &Instruction) {
             match instruction.size {
                 InstructionSize::OneByte => {
                     machine_state.write_memory1(machine_state.sp, value as i8);
-                    machine_state.sp += 1;
+                    machine_state.sp -= 1;
                 }
                 InstructionSize::TwoByte => {
                     machine_state.write_memory2(machine_state.sp, value as i16);
-                    machine_state.sp += 2;
+                    machine_state.sp -= 2;
                 }
                 InstructionSize::FourByte => {
                     machine_state.write_memory4(machine_state.sp, value as i32);
-                    machine_state.sp += 4;
+                    machine_state.sp -= 4;
                 }
                 InstructionSize::EightByte => {
                     machine_state.write_memory8(machine_state.sp, value);
-                    machine_state.sp += 8;
+                    machine_state.sp -= 8;
                 }
             };
         }
@@ -263,19 +263,19 @@ pub fn execute(machine_state: &mut MachineState, instruction: &Instruction) {
             );
             let value = match instruction.size {
                 InstructionSize::OneByte => {
-                    machine_state.sp -= 1;
+                    machine_state.sp += 1;
                     machine_state.read_memory1(machine_state.sp) as i64
                 }
                 InstructionSize::TwoByte => {
-                    machine_state.sp -= 2;
+                    machine_state.sp += 2;
                     machine_state.read_memory2(machine_state.sp) as i64
                 }
                 InstructionSize::FourByte => {
-                    machine_state.sp -= 4;
+                    machine_state.sp += 4;
                     machine_state.read_memory4(machine_state.sp) as i64
                 }
                 InstructionSize::EightByte => {
-                    machine_state.sp -= 8;
+                    machine_state.sp += 8;
                     machine_state.read_memory8(machine_state.sp) as i64
                 }
             };
@@ -287,7 +287,7 @@ pub fn execute(machine_state: &mut MachineState, instruction: &Instruction) {
                 "CALL instruction requires one argument"
             );
             machine_state.write_memory8(machine_state.sp, machine_state.pc);
-            machine_state.sp += 8;
+            machine_state.sp -= 8;
             cpu_utils::conditional_jump(true, machine_state, &instruction.params[0]);
         }
         InstructionType::RET => {
