@@ -62,8 +62,9 @@ pub enum ParameterType {
     ImmediateEightByte = 0x5,
 }
 
-#[derive(FromPrimitive, ToPrimitive, Debug)]
+#[derive(PartialEq, FromPrimitive, ToPrimitive, Debug)]
 pub enum InstructionSize {
+    Zero = 0x0,
     OneByte = 0x1,
     TwoByte = 0x2,
     FourByte = 0x3,

@@ -1,26 +1,36 @@
+use core::panic;
+
 use crate::cpu_utils;
 use crate::instruction::Instruction;
 use crate::instruction_set::{InstructionSize, InstructionType};
 use crate::machine_state::MachineState;
 
-pub fn execute(machine_state: &mut MachineState, instruction: &Instruction) {
+#[derive(Debug)]
+pub enum ExecutionError {
+    InvalidNumberOfArguments,
+    InvalidInstructionSize,
+}
+
+pub fn execute(
+    machine_state: &mut MachineState,
+    instruction: &Instruction,
+) -> Result<(), ExecutionError> {
     match instruction.instruction {
         InstructionType::MOV => {
-            assert!(
-                instruction.params.len() == 2,
-                "MOV instruction requires two arguments"
-            );
+            if instruction.params.len() != 2 {
+                return Err(ExecutionError::InvalidNumberOfArguments);
+            }
             let value = machine_state.get_value(&instruction.params[0], &instruction.size);
             machine_state.set_value(value, &instruction.params[1], &instruction.size);
         }
         InstructionType::LD => {
-            assert!(
-                instruction.params.len() == 2,
-                "LD instruction requires two arguments"
-            );
+            if instruction.params.len() != 2 {
+                return Err(ExecutionError::InvalidNumberOfArguments);
+            }
             let address =
                 machine_state.get_value(&instruction.params[0], &InstructionSize::EightByte);
             let value = match instruction.size {
+                InstructionSize::Zero => return Err(ExecutionError::InvalidInstructionSize),
                 InstructionSize::OneByte => machine_state.read_memory1(address) as i64,
                 InstructionSize::TwoByte => machine_state.read_memory2(address) as i64,
                 InstructionSize::FourByte => machine_state.read_memory4(address) as i64,
@@ -29,14 +39,14 @@ pub fn execute(machine_state: &mut MachineState, instruction: &Instruction) {
             machine_state.set_value(value, &instruction.params[1], &instruction.size);
         }
         InstructionType::STR => {
-            assert!(
-                instruction.params.len() == 2,
-                "STR instruction requires two arguments"
-            );
+            if instruction.params.len() != 2 {
+                return Err(ExecutionError::InvalidNumberOfArguments);
+            }
             let value = machine_state.get_value(&instruction.params[0], &instruction.size);
             let address =
                 machine_state.get_value(&instruction.params[1], &InstructionSize::EightByte);
             match instruction.size {
+                InstructionSize::Zero => return Err(ExecutionError::InvalidInstructionSize),
                 InstructionSize::OneByte => machine_state.write_memory1(address, value as i8),
                 InstructionSize::TwoByte => machine_state.write_memory2(address, value as i16),
                 InstructionSize::FourByte => machine_state.write_memory4(address, value as i32),
@@ -58,19 +68,17 @@ pub fn execute(machine_state: &mut MachineState, instruction: &Instruction) {
             machine_state.set_value(result, &instruction.params[1], &instruction.size);
         }
         InstructionType::INC => {
-            assert!(
-                instruction.params.len() == 1,
-                "INC instruction requires one argument"
-            );
+            if instruction.params.len() != 1 {
+                return Err(ExecutionError::InvalidNumberOfArguments);
+            }
             let value = machine_state.get_value(&instruction.params[0], &instruction.size);
             let result = value + 1;
             machine_state.set_value(result, &instruction.params[0], &instruction.size);
         }
         InstructionType::DEC => {
-            assert!(
-                instruction.params.len() == 1,
-                "DEC instruction requires one argument"
-            );
+            if instruction.params.len() != 1 {
+                return Err(ExecutionError::InvalidNumberOfArguments);
+            }
             let value = machine_state.get_value(&instruction.params[0], &instruction.size);
             let result = value - 1;
             machine_state.set_value(result, &instruction.params[0], &instruction.size);
@@ -114,10 +122,9 @@ pub fn execute(machine_state: &mut MachineState, instruction: &Instruction) {
             machine_state.set_value(result, &instruction.params[1], &instruction.size);
         }
         InstructionType::NOT => {
-            assert!(
-                instruction.params.len() == 1,
-                "NOT instruction requires one argument"
-            );
+            if instruction.params.len() != 1 {
+                return Err(ExecutionError::InvalidNumberOfArguments);
+            }
             let value = machine_state.get_value(&instruction.params[0], &instruction.size);
             let result = !value;
             machine_state.set_value(result, &instruction.params[0], &instruction.size);
@@ -125,105 +132,94 @@ pub fn execute(machine_state: &mut MachineState, instruction: &Instruction) {
 
         // jumps
         InstructionType::JMP => {
-            assert!(
-                instruction.params.len() == 1,
-                "JMP instruction requires one argument"
-            );
+            if instruction.params.len() != 1 {
+                return Err(ExecutionError::InvalidNumberOfArguments);
+            }
             cpu_utils::conditional_jump(true, machine_state, &instruction.params[0]);
         }
         InstructionType::JE => {
-            assert!(
-                instruction.params.len() == 3,
-                "JE instruction requires three arguments"
-            );
+            if instruction.params.len() != 3 {
+                return Err(ExecutionError::InvalidNumberOfArguments);
+            }
             let value1 = machine_state.get_value(&instruction.params[0], &instruction.size);
             let value2 = machine_state.get_value(&instruction.params[1], &instruction.size);
             cpu_utils::conditional_jump(value1 == value2, machine_state, &instruction.params[2]);
         }
         InstructionType::JNE => {
-            assert!(
-                instruction.params.len() == 3,
-                "JNE instruction requires three arguments"
-            );
+            if instruction.params.len() != 3 {
+                return Err(ExecutionError::InvalidNumberOfArguments);
+            }
             let value1 = machine_state.get_value(&instruction.params[0], &instruction.size);
             let value2 = machine_state.get_value(&instruction.params[1], &instruction.size);
             cpu_utils::conditional_jump(value1 != value2, machine_state, &instruction.params[2]);
         }
         InstructionType::JLS => {
-            assert!(
-                instruction.params.len() == 3,
-                "JLS instruction requires three arguments"
-            );
+            if instruction.params.len() != 3 {
+                return Err(ExecutionError::InvalidNumberOfArguments);
+            }
             let value1 = machine_state.get_value(&instruction.params[0], &instruction.size);
             let value2 = machine_state.get_value(&instruction.params[1], &instruction.size);
             let result = value1 < value2;
             cpu_utils::conditional_jump(result, machine_state, &instruction.params[2]);
         }
         InstructionType::JLU => {
-            assert!(
-                instruction.params.len() == 3,
-                "JLU instruction requires three arguments"
-            );
+            if instruction.params.len() != 3 {
+                return Err(ExecutionError::InvalidNumberOfArguments);
+            }
             let value1 = machine_state.get_value(&instruction.params[0], &instruction.size);
             let value2 = machine_state.get_value(&instruction.params[1], &instruction.size);
             let result = (value1 as u64) < (value2 as u64);
             cpu_utils::conditional_jump(result, machine_state, &instruction.params[2]);
         }
         InstructionType::JLES => {
-            assert!(
-                instruction.params.len() == 3,
-                "JLES instruction requires three arguments"
-            );
+            if instruction.params.len() != 3 {
+                return Err(ExecutionError::InvalidNumberOfArguments);
+            }
             let value1 = machine_state.get_value(&instruction.params[0], &instruction.size);
             let value2 = machine_state.get_value(&instruction.params[1], &instruction.size);
             let result = value1 <= value2;
             cpu_utils::conditional_jump(result, machine_state, &instruction.params[2]);
         }
         InstructionType::JLEU => {
-            assert!(
-                instruction.params.len() == 3,
-                "JLEU instruction requires three arguments"
-            );
+            if instruction.params.len() != 3 {
+                return Err(ExecutionError::InvalidNumberOfArguments);
+            }
             let value1 = machine_state.get_value(&instruction.params[0], &instruction.size);
             let value2 = machine_state.get_value(&instruction.params[1], &instruction.size);
             let result = (value1 as u64) <= (value2 as u64);
             cpu_utils::conditional_jump(result, machine_state, &instruction.params[2]);
         }
         InstructionType::JGS => {
-            assert!(
-                instruction.params.len() == 3,
-                "JGS instruction requires three arguments"
-            );
+            if instruction.params.len() != 3 {
+                return Err(ExecutionError::InvalidNumberOfArguments);
+            }
             let value1 = machine_state.get_value(&instruction.params[0], &instruction.size);
             let value2 = machine_state.get_value(&instruction.params[1], &instruction.size);
             let result = value1 > value2;
             cpu_utils::conditional_jump(result, machine_state, &instruction.params[2]);
         }
         InstructionType::JGU => {
-            assert!(
-                instruction.params.len() == 3,
-                "JGU instruction requires three arguments"
-            );
+            if instruction.params.len() != 3 {
+                return Err(ExecutionError::InvalidNumberOfArguments);
+            }
             let value1 = machine_state.get_value(&instruction.params[0], &instruction.size);
             let value2 = machine_state.get_value(&instruction.params[1], &instruction.size);
             let result = (value1 as u64) > (value2 as u64);
             cpu_utils::conditional_jump(result, machine_state, &instruction.params[2]);
         }
         InstructionType::JGES => {
-            assert!(
-                instruction.params.len() == 3,
-                "JGES instruction requires three arguments"
-            );
+            if instruction.params.len() != 3 {
+                return Err(ExecutionError::InvalidNumberOfArguments);
+            }
             let value1 = machine_state.get_value(&instruction.params[0], &instruction.size);
             let value2 = machine_state.get_value(&instruction.params[1], &instruction.size);
             let result = value1 >= value2;
             cpu_utils::conditional_jump(result, machine_state, &instruction.params[2]);
         }
         InstructionType::JGEU => {
-            assert!(
-                instruction.params.len() == 3,
-                "JGEU instruction requires three arguments"
-            );
+            if instruction.params.len() != 3 {
+                return Err(ExecutionError::InvalidNumberOfArguments);
+            }
             let value1 = machine_state.get_value(&instruction.params[0], &instruction.size);
             let value2 = machine_state.get_value(&instruction.params[1], &instruction.size);
             let result = (value1 as u64) >= (value2 as u64);
@@ -232,12 +228,12 @@ pub fn execute(machine_state: &mut MachineState, instruction: &Instruction) {
 
         // stack
         InstructionType::PUSH => {
-            assert!(
-                instruction.params.len() == 1,
-                "PUSH instruction requires one argument"
-            );
+            if instruction.params.len() != 1 {
+                return Err(ExecutionError::InvalidNumberOfArguments);
+            }
             let value = machine_state.get_value(&instruction.params[0], &instruction.size);
             match instruction.size {
+                InstructionSize::Zero => return Err(ExecutionError::InvalidInstructionSize),
                 InstructionSize::OneByte => {
                     machine_state.write_memory1(machine_state.sp, value as i8);
                     machine_state.sp -= 1;
@@ -257,11 +253,11 @@ pub fn execute(machine_state: &mut MachineState, instruction: &Instruction) {
             };
         }
         InstructionType::POP => {
-            assert!(
-                instruction.params.len() == 1,
-                "POP instruction requires one argument"
-            );
+            if instruction.params.len() != 1 {
+                return Err(ExecutionError::InvalidNumberOfArguments);
+            }
             let value = match instruction.size {
+                InstructionSize::Zero => return Err(ExecutionError::InvalidInstructionSize),
                 InstructionSize::OneByte => {
                     machine_state.sp += 1;
                     machine_state.read_memory1(machine_state.sp) as i64
@@ -282,20 +278,22 @@ pub fn execute(machine_state: &mut MachineState, instruction: &Instruction) {
             machine_state.set_value(value, &instruction.params[0], &instruction.size);
         }
         InstructionType::CALL => {
-            assert!(
-                instruction.params.len() == 1,
-                "CALL instruction requires one argument"
-            );
+            if instruction.params.len() != 1 {
+                return Err(ExecutionError::InvalidNumberOfArguments);
+            }
+            if instruction.size != InstructionSize::EightByte {
+                return Err(ExecutionError::InvalidInstructionSize);
+            }
             machine_state.write_memory8(machine_state.sp, machine_state.pc);
             machine_state.sp -= 8;
             cpu_utils::conditional_jump(true, machine_state, &instruction.params[0]);
         }
         InstructionType::RET => {
-            assert!(
-                instruction.params.len() == 0,
-                "RET instruction does not take any arguemnts"
-            );
+            if instruction.params.len() == 0 {
+                return Err(ExecutionError::InvalidNumberOfArguments);
+            }
             let value = match instruction.size {
+                InstructionSize::Zero => return Err(ExecutionError::InvalidInstructionSize),
                 InstructionSize::OneByte => {
                     machine_state.sp -= 1;
                     machine_state.read_memory1(machine_state.sp) as i64
@@ -335,4 +333,5 @@ pub fn execute(machine_state: &mut MachineState, instruction: &Instruction) {
             machine_state.halt = true;
         }
     }
+    Ok(())
 }

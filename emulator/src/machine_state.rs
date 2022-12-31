@@ -1,8 +1,8 @@
-use core::panic;
 use std::convert::TryInto;
 
 use crate::instruction::InstructionParam;
 use crate::instruction_set::{InstructionSize, Register};
+use crate::{cpu, decoder};
 
 pub struct MachineState {
     pub i0: i64,
@@ -76,6 +76,25 @@ impl MachineState {
         }
     }
 
+    pub fn run(&mut self) {
+        loop {
+            let (instr, offset) = decoder::decode(&self);
+
+            self.pc += offset;
+            let result = cpu::execute(self, &instr);
+            match result {
+                Ok(()) => (),
+                Err(err) => {
+                    println!("Execution error: {:?}, {:?}", err, instr.instruction);
+                    self.halt = true;
+                }
+            }
+            if self.halt {
+                break;
+            }
+        }
+    }
+
     pub fn get_value(&self, instruction_param: &InstructionParam, size: &InstructionSize) -> i64 {
         let value = match instruction_param {
             InstructionParam::Immediate(value) => *value,
@@ -110,6 +129,7 @@ impl MachineState {
             },
         };
         match size {
+            InstructionSize::Zero => unreachable!("Can't use size zero to get value"),
             InstructionSize::OneByte => value as i8 as i64,
             InstructionSize::TwoByte => value as i16 as i64,
             InstructionSize::FourByte => value as i32 as i64,
@@ -124,6 +144,7 @@ impl MachineState {
         size: &InstructionSize,
     ) {
         let value = match size {
+            InstructionSize::Zero => unreachable!("Can't use size zero to set value"),
             InstructionSize::OneByte => value as i8 as i64,
             InstructionSize::TwoByte => value as i16 as i64,
             InstructionSize::FourByte => value as i32 as i64,

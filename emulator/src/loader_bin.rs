@@ -1,7 +1,7 @@
-use std::io::prelude::*;
 use std::fs::File;
+use std::io::prelude::*;
 
-use crate::{machine_state, cpu, decoder};
+use crate::machine_state;
 
 pub fn dump(filename: &str) {
     let mut file = File::open(filename).expect("Cannot open file");
@@ -12,12 +12,5 @@ pub fn dump(filename: &str) {
 
     ms.memory[0x1000..0x1000 + buffer.len()].copy_from_slice(&buffer);
 
-    loop {
-        let (instr, offset) = decoder::decode(&ms);
-        ms.pc += offset;
-        cpu::execute(&mut ms, &instr);
-        if ms.halt {
-            break;
-        }
-    }
+    ms.run();
 }
