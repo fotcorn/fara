@@ -67,22 +67,6 @@ pub fn execute(
             let result = value1 - value2;
             machine_state.set_value(result, &instruction.params[1], &instruction.size);
         }
-        InstructionType::INC => {
-            if instruction.params.len() != 1 {
-                return Err(ExecutionError::InvalidNumberOfArguments);
-            }
-            let value = machine_state.get_value(&instruction.params[0], &instruction.size);
-            let result = value + 1;
-            machine_state.set_value(result, &instruction.params[0], &instruction.size);
-        }
-        InstructionType::DEC => {
-            if instruction.params.len() != 1 {
-                return Err(ExecutionError::InvalidNumberOfArguments);
-            }
-            let value = machine_state.get_value(&instruction.params[0], &instruction.size);
-            let result = value - 1;
-            machine_state.set_value(result, &instruction.params[0], &instruction.size);
-        }
         InstructionType::DIV => {
             let (value1, value2) =
                 cpu_utils::get_two_params_value(&instruction, &machine_state, "DIV");

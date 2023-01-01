@@ -7,11 +7,9 @@ pub enum InstructionType {
     // arithmetic
     ADD = 0x0101,
     SUB = 0x0102,
-    INC = 0x0103,
-    DEC = 0x0104,
-    DIV = 0x0105,
-    MUL = 0x0106,
-    MOD = 0x0107,
+    MUL = 0x0103,
+    DIV = 0x0104,
+    MOD = 0x0105,
 
     // binary
     AND = 0x0201,
