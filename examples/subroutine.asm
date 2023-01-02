@@ -2,8 +2,8 @@
 jmp main
 
 inc2:
-    inc %i0
-    inc %i0
+    add 1, %i0
+    add 1, %i0
     ret
 
 main:

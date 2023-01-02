@@ -5,12 +5,12 @@ loop:
     je %i0, 'q', end
     je %i0, 8, backspace
     str1 %i0, %i1
-    inc %i1
+    add 1, %i1
     jmp loop
 end:
     halt
 
 backspace:
-    dec %i1
+    sub 1, %i1
     str1 0, %i1
     jmp loop

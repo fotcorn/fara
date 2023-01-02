@@ -9,7 +9,7 @@ int_to_char: // parameter is in %i0
         mod %i0, %i3  // %i3 = x % j
         je %i3, %i0, break1
 
-        inc %i1  // i++
+        add 1, %i1  // i++
         mul 10, %i2 // j = j * 10
         jmp loop1
 
