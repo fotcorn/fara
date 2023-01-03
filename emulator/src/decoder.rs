@@ -58,10 +58,7 @@ pub fn decode(ms: &MachineState, print_instr: bool) -> (Instruction, i64) {
 
         match param_type {
             ParameterType::NoParameter => {
-                if print_instr {
-                    println!("{:?}", instr);
-                }
-                return (instr, offset);
+                break;
             }
             ParameterType::Register => {
                 let register = ms.memory[address];
