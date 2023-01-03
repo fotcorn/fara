@@ -268,34 +268,20 @@ pub fn execute(
             if instruction.size != InstructionSize::EightByte {
                 return Err(ExecutionError::InvalidInstructionSize);
             }
-            machine_state.write_memory8(machine_state.sp, machine_state.pc);
             machine_state.sp -= 8;
+            machine_state.write_memory8(machine_state.sp, machine_state.pc);
             cpu_utils::conditional_jump(true, machine_state, &instruction.params[0]);
         }
         InstructionType::RET => {
-            if instruction.params.len() == 0 {
+            if instruction.params.len() != 0 {
                 return Err(ExecutionError::InvalidNumberOfArguments);
             }
-            let value = match instruction.size {
-                InstructionSize::Zero => return Err(ExecutionError::InvalidInstructionSize),
-                InstructionSize::OneByte => {
-                    machine_state.sp -= 1;
-                    machine_state.read_memory1(machine_state.sp) as i64
-                }
-                InstructionSize::TwoByte => {
-                    machine_state.sp -= 2;
-                    machine_state.read_memory2(machine_state.sp) as i64
-                }
-                InstructionSize::FourByte => {
-                    machine_state.sp -= 4;
-                    machine_state.read_memory4(machine_state.sp) as i64
-                }
-                InstructionSize::EightByte => {
-                    machine_state.sp -= 8;
-                    machine_state.read_memory8(machine_state.sp) as i64
-                }
-            };
-            machine_state.pc = value;
+            if instruction.size != InstructionSize::Zero {
+                return Err(ExecutionError::InvalidInstructionSize);
+            }
+            let return_address = machine_state.read_memory8(machine_state.sp);
+            machine_state.sp += 8;
+            machine_state.pc = return_address;
         }
 
         // io
