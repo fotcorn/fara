@@ -18,7 +18,7 @@ const PARAM1_TYPE: u32 = 0b1111 << PARAM1_TYPE_OFFSET;
 const PARAM2_TYPE: u32 = 0b1111 << PARAM2_TYPE_OFFSET;
 const PARAM3_TYPE: u32 = 0b1111 << PARAM3_TYPE_OFFSET;
 
-pub fn decode(ms: &MachineState) -> (Instruction, i64) {
+pub fn decode(ms: &MachineState, print_instr: bool) -> (Instruction, i64) {
     let instr = &ms.memory[ms.pc as usize..ms.pc as usize + 4];
     let instr = u32::from_be_bytes(instr.try_into().unwrap());
 
@@ -58,6 +58,9 @@ pub fn decode(ms: &MachineState) -> (Instruction, i64) {
 
         match param_type {
             ParameterType::NoParameter => {
+                if print_instr {
+                    println!("{:?}", instr);
+                }
                 return (instr, offset);
             }
             ParameterType::Register => {
@@ -97,5 +100,9 @@ pub fn decode(ms: &MachineState) -> (Instruction, i64) {
             }
         }
     }
+    if print_instr {
+        println!("{:?}", instr);
+    }
+
     (instr, offset)
 }

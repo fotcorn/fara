@@ -3,7 +3,7 @@ use std::io::prelude::*;
 
 use crate::machine_state;
 
-pub fn dump(filename: &str) {
+pub fn dump(filename: &str, print_instr: bool) {
     let mut file = File::open(filename).expect("Cannot open file");
     let mut buffer = Vec::new();
     file.read_to_end(&mut buffer).expect("Failed to read file.");
@@ -12,5 +12,5 @@ pub fn dump(filename: &str) {
 
     ms.memory[0x1000..0x1000 + buffer.len()].copy_from_slice(&buffer);
 
-    ms.run();
+    ms.run(print_instr);
 }

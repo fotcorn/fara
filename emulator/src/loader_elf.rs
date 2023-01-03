@@ -5,7 +5,7 @@ use xmas_elf::ElfFile;
 
 use crate::machine_state::MachineState;
 
-pub fn elf(filename: &str, _symbol: &str) {
+pub fn elf(filename: &str, _symbol: &str, print_instr: bool) {
     let mut file = File::open(filename).expect("Cannot open file");
     let mut buffer = Vec::new();
 
@@ -22,5 +22,5 @@ pub fn elf(filename: &str, _symbol: &str) {
     let mut ms = MachineState::new();
     ms.memory[0x1000..0x1000 + text_section.len()].copy_from_slice(&text_section);
 
-    ms.run();
+    ms.run(print_instr);
 }

@@ -76,9 +76,9 @@ impl MachineState {
         }
     }
 
-    pub fn run(&mut self) {
+    pub fn run(&mut self, print_instr: bool) {
         loop {
-            let (instr, offset) = decoder::decode(&self);
+            let (instr, offset) = decoder::decode(&self, print_instr);
 
             self.pc += offset;
             let result = cpu::execute(self, &instr);
