@@ -3,6 +3,8 @@ pub enum InstructionType {
     MOV = 0x0001,
     LD = 0x0002,
     STR = 0x0003,
+    LDX = 0x0004, // load with offset
+    STRX = 0x0005, // store with offset
 
     // arithmetic
     ADD = 0x0101,

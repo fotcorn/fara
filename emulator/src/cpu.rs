@@ -38,6 +38,24 @@ pub fn execute(
             };
             machine_state.set_value(value, &instruction.params[1], &instruction.size);
         }
+        InstructionType::LDX => {
+            if instruction.params.len() != 3 {
+                return Err(ExecutionError::InvalidNumberOfArguments);
+            }
+            let address =
+                machine_state.get_value(&instruction.params[0], &InstructionSize::EightByte);
+            let offset =
+                machine_state.get_value(&instruction.params[1], &InstructionSize::EightByte);
+            let effective_address = address + offset;
+            let value = match instruction.size {
+                InstructionSize::Zero => return Err(ExecutionError::InvalidInstructionSize),
+                InstructionSize::OneByte => machine_state.read_memory1(effective_address) as i64,
+                InstructionSize::TwoByte => machine_state.read_memory2(effective_address) as i64,
+                InstructionSize::FourByte => machine_state.read_memory4(effective_address) as i64,
+                InstructionSize::EightByte => machine_state.read_memory8(effective_address) as i64,
+            };
+            machine_state.set_value(value, &instruction.params[2], &instruction.size);
+        }
         InstructionType::STR => {
             if instruction.params.len() != 2 {
                 return Err(ExecutionError::InvalidNumberOfArguments);
@@ -51,6 +69,24 @@ pub fn execute(
                 InstructionSize::TwoByte => machine_state.write_memory2(address, value as i16),
                 InstructionSize::FourByte => machine_state.write_memory4(address, value as i32),
                 InstructionSize::EightByte => machine_state.write_memory8(address, value),
+            };
+        }
+        InstructionType::STRX => {
+            if instruction.params.len() != 3 {
+                return Err(ExecutionError::InvalidNumberOfArguments);
+            }
+            let value = machine_state.get_value(&instruction.params[0], &instruction.size);
+            let address =
+                machine_state.get_value(&instruction.params[1], &InstructionSize::EightByte);
+            let offset=
+                machine_state.get_value(&instruction.params[2], &InstructionSize::EightByte);
+            let effective_address = address + offset;
+            match instruction.size {
+                InstructionSize::Zero => return Err(ExecutionError::InvalidInstructionSize),
+                InstructionSize::OneByte => machine_state.write_memory1(effective_address, value as i8),
+                InstructionSize::TwoByte => machine_state.write_memory2(effective_address, value as i16),
+                InstructionSize::FourByte => machine_state.write_memory4(effective_address, value as i32),
+                InstructionSize::EightByte => machine_state.write_memory8(effective_address, value),
             };
         }
 
