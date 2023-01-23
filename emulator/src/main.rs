@@ -40,7 +40,7 @@ fn main() {
         .get_matches();
 
     let filename = matches.value_of("file").unwrap();
-    let symbol = matches.value_of("symbol").unwrap_or("main");
+    let symbol = matches.value_of("symbol").unwrap_or("_start");
     let loader = matches.value_of("loader").unwrap_or("bin");
     let print_instr = matches.is_present("print-instructions");
 

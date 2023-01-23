@@ -67,10 +67,10 @@ impl MachineState {
             i22: 0,
             i23: 0,
 
-            pc: 0x1000,
-            sp: 0x10000, // stack is at the end of the memory, growing down
+            pc: 0x10000,
+            sp: 1048576, // stack is at the end of the memory, growing down
             fp: 0x0,
-            memory: vec![0; 0x10000],
+            memory: vec![0; 1048576],
 
             halt: false,
         }
@@ -214,5 +214,8 @@ impl MachineState {
     }
     pub fn write_memory8(&mut self, address: i64, value: i64) {
         self.memory[address as usize..address as usize + 8].copy_from_slice(&value.to_le_bytes());
+    }
+    pub fn write_memory(&mut self, address: usize, data: &[u8]) {
+        self.memory[address..address + data.len()].copy_from_slice(data);
     }
 }
