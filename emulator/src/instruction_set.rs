@@ -5,6 +5,7 @@ pub enum InstructionType {
     STR = 0x0003,
     LDX = 0x0004, // load with offset
     STRX = 0x0005, // store with offset
+    LEA = 0x0006, // load effective address
 
     // arithmetic
     ADD = 0x0101,

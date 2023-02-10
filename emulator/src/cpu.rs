@@ -56,6 +56,20 @@ pub fn execute(
             };
             machine_state.set_value(value, &instruction.params[2], &instruction.size);
         }
+        InstructionType::LEA => {
+            if instruction.params.len() != 3 {
+                return Err(ExecutionError::InvalidNumberOfArguments);
+            }
+            if instruction.size != InstructionSize::EightByte {
+                return Err(ExecutionError::InvalidInstructionSize);
+            }
+            let address =
+                machine_state.get_value(&instruction.params[0], &InstructionSize::EightByte);
+            let offset =
+                machine_state.get_value(&instruction.params[1], &InstructionSize::EightByte);
+            let effective_address = address + offset;
+            machine_state.set_value(effective_address, &instruction.params[2], &instruction.size);
+        }
         InstructionType::STR => {
             if instruction.params.len() != 2 {
                 return Err(ExecutionError::InvalidNumberOfArguments);
