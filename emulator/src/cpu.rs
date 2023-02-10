@@ -352,6 +352,18 @@ pub fn execute(
         InstructionType::HALT => {
             machine_state.halt = true;
         }
+        InstructionType::SL => {
+            let (value1, value2) =
+                cpu_utils::get_two_params_value(&instruction, &machine_state, "SL");
+            let result = value1 << value2;
+            machine_state.set_value(result, &instruction.params[0], &instruction.size);
+        }
+        InstructionType::SR => {
+            let (value1, value2) =
+                cpu_utils::get_two_params_value(&instruction, &machine_state, "SR");
+            let result = value1 >> value2;
+            machine_state.set_value(result, &instruction.params[0], &instruction.size);
+        }
     }
     Ok(())
 }

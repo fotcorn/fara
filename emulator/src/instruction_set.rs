@@ -19,6 +19,8 @@ pub enum InstructionType {
     OR = 0x0202,
     XOR = 0x0203,
     NOT = 0x0204,
+    SL = 0x0205, // shift left
+    SR = 0x0206, // shift right
 
     // compare & jumps
     JMP = 0x0301,
