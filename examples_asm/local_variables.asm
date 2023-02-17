@@ -1,4 +1,5 @@
-main:
+.globl _start
+_start:
     mov 5, %i0
     mov 3, %i1
 
