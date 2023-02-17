@@ -1,5 +1,7 @@
 # instructions
 
+For opcodes, see emulator/src/instruction_set.rs.
+
 ## memory
 
 - mov: Copy value from parameter 1 into parameter 2
